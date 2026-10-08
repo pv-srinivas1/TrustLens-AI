@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { 
   Layers, 
   Search, 
@@ -19,12 +20,21 @@ import { useTrustLens } from "@/lib/store";
 import { EvidenceItem } from "@/lib/data";
 import { ExportMenu } from "@/components/ui/export-menu";
 
-export default function EvidencePage() {
+function EvidenceContent() {
   const { evidence, addEvidence } = useTrustLens();
+  const searchParams = useSearchParams();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sourceFilter, setSourceFilter] = useState<"ALL" | "real" | "demo">("ALL");
-  const [activeFilter, setActiveFilter] = useState<"All" | "Images" | "Videos" | "Processing" | "Completed" | "Failed">("All");
+  const [activeFilter, setActiveFilter] = useState<"All" | "Duplicates" | "Images" | "Videos" | "Processing" | "Completed" | "Failed">("All");
+
+  // Automatically activate Duplicates filter if query parameter is ?tab=duplicates
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "duplicates") {
+      setActiveFilter("Duplicates");
+    }
+  }, [searchParams]);
 
   // Inspector Modal
   const [inspectedItem, setInspectedItem] = useState<EvidenceItem | null>(null);
@@ -52,6 +62,7 @@ export default function EvidencePage() {
 
     if (!matchesSource) return false;
 
+    if (activeFilter === "Duplicates") return (item as any).duplicateMatch !== undefined;
     if (activeFilter === "Images") return item.fileType === "JPG" || item.fileType === "PNG";
     if (activeFilter === "Videos") return item.fileType === "MP4";
     if (activeFilter === "Processing") return item.analysisStatus === "Processing";
@@ -99,21 +110,21 @@ export default function EvidencePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
         <div>
-          <h1 className="font-display text-[28px] text-[#111] uppercase tracking-tight flex items-center">
-            <Layers className="w-7 h-7 mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
-            Evidence
+          <h1 className="font-display text-[24px] sm:text-[28px] text-[#111] uppercase tracking-tight flex items-center">
+            <Layers className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
+            Evidence Explorer
           </h1>
-          <p className="text-[14px] text-[#111]/70 font-medium">Inspect uploaded claim evidence and forensic signals.</p>
+          <p className="text-[13px] sm:text-[14px] text-[#111]/70 font-medium">Inspect uploaded claim evidence, duplicate matches, and forensic signals.</p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2 sm:space-x-3 w-full sm:w-auto">
           <ExportMenu 
             type="evidence" 
             queryParams={{ source_type: sourceFilter === "ALL" ? "" : sourceFilter }} 
           />
           <button 
             onClick={() => setIsUploadModalOpen(true)}
-            className="flex items-center px-4 py-2.5 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
+            className="flex-1 sm:flex-none flex items-center justify-center px-4 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
           >
             <Upload className="w-4 h-4 mr-1.5" strokeWidth={2.5} /> Upload Evidence
           </button>
@@ -121,7 +132,7 @@ export default function EvidencePage() {
       </div>
 
       {/* Search & Filter Pills */}
-      <div className="bg-white border-2 border-[#111] rounded-[14px] p-4 neo-shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="bg-white border-2 border-[#111] rounded-[14px] p-3 sm:p-4 neo-shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-3 w-4 h-4 text-[#111]" strokeWidth={2.5} />
           <input 
@@ -129,7 +140,7 @@ export default function EvidencePage() {
             placeholder="Search evidence ID, Claim ID, filename..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] text-[#111] placeholder:text-[#111]/50 focus:outline-none focus:bg-white"
+            className="w-full pl-10 pr-4 py-2 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] text-[#111] placeholder:text-[#111]/50 focus:outline-none focus:bg-white"
           />
         </div>
 
@@ -141,7 +152,7 @@ export default function EvidencePage() {
                 key={s}
                 type="button"
                 onClick={() => setSourceFilter(s)}
-                className={`px-3 py-1 rounded-[6px] font-bold text-[11px] uppercase transition-all ${
+                className={`px-3 py-1.5 min-h-[36px] rounded-[6px] font-bold text-[11px] uppercase transition-all ${
                   sourceFilter === s
                     ? "bg-[#111] text-white"
                     : "text-[#111] hover:bg-white"
@@ -152,26 +163,108 @@ export default function EvidencePage() {
             ))}
           </div>
 
-          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 md:pb-0">
-            {(["All", "Images", "Videos", "Processing", "Completed", "Failed"] as const).map((filter) => (
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+            {(["All", "Duplicates", "Images", "Videos", "Processing", "Completed", "Failed"] as const).map((filter) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`px-3 py-1.5 border-2 border-[#111] rounded-[8px] font-bold text-[12px] whitespace-nowrap transition-transform ${
+                className={`px-3 py-1.5 min-h-[38px] border-2 border-[#111] rounded-[8px] font-bold text-[12px] whitespace-nowrap transition-transform ${
                   activeFilter === filter
                     ? "bg-[#ffd23f] text-[#111] neo-shadow-sm"
                     : "bg-white text-[#111] hover:bg-[#fdf9f0]"
                 }`}
               >
-                {filter}
+                {filter === "Duplicates" ? "⚠ Duplicates" : filter}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md overflow-x-auto">
+      {/* MOBILE EVIDENCE GALLERY: 1 column on small phones, 2 columns on larger phones */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-3.5">
+        {filteredEvidence.length === 0 ? (
+          <div className="col-span-full py-12 text-center bg-white border-2 border-[#111] rounded-[14px] p-6">
+            <p className="font-bold text-[15px] text-[#111]">No evidence found</p>
+            <p className="text-[12px] text-[#111]/60 mt-1">Try resetting search or filter criteria.</p>
+          </div>
+        ) : (
+          filteredEvidence.map((ev) => {
+            const evSource = (ev as any).sourceType || (ev.claimId === "CLM-1001" || ev.filename.includes("package") || ev.filename.includes("crush") ? "demo" : "real_upload");
+            const isDemo = evSource === "demo";
+            const isCamera = evSource === "camera_capture";
+
+            return (
+              <div 
+                key={ev.id} 
+                className="bg-white border-2 border-[#111] rounded-[14px] p-3 neo-shadow-sm flex flex-col justify-between space-y-3"
+              >
+                {/* Full-width responsive thumbnail */}
+                <div className="relative w-full aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] overflow-hidden flex items-center justify-center">
+                  <img 
+                    src={ev.imageSrc || "/damage.jpg"} 
+                    alt={ev.filename} 
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (!target.src.includes("/damage.jpg")) {
+                        target.src = "/damage.jpg";
+                      }
+                    }}
+                  />
+                  <div className="absolute top-2 left-2">
+                    <span className={`px-2 py-0.5 rounded border border-[#111] font-bold text-[9px] uppercase font-mono neo-shadow-xs ${
+                      isDemo ? 'bg-[#ffd23f] text-[#111]' : isCamera ? 'bg-[#a0e7e5] text-[#111]' : 'bg-[#3ddc97] text-[#111]'
+                    }`}>
+                      {isDemo ? 'Demo' : isCamera ? 'Camera' : 'Real Upload'}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-[#111] text-white font-mono text-[9px] font-bold rounded">
+                    {ev.fileType} • {ev.fileSize}
+                  </div>
+                </div>
+
+                {/* Card Info */}
+                <div className="space-y-1 text-[12px]">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-bold text-[#111]">{ev.id}</span>
+                    <span className={`px-2 py-0.5 rounded-full border border-[#111] font-mono text-[10px] font-bold ${
+                      ev.analysisStatus === 'Completed' ? 'bg-[#3ddc97]' :
+                      ev.analysisStatus === 'Processing' ? 'bg-[#ffd23f]' : 'bg-[#ff6b5e]'
+                    }`}>
+                      {ev.analysisStatus}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-[#111]/70 font-mono text-[11px]">
+                    <span>Claim: <Link href={`/dashboard/claims/${ev.claimId}`} className="font-bold text-[#111] underline">{ev.claimId}</Link></span>
+                    <span>{ev.uploadedAt}</span>
+                  </div>
+                  <div className="font-mono text-[11px] text-[#111]/80 truncate">{ev.filename}</div>
+
+                  {ev.duplicateMatch && (
+                    <div className="mt-1 px-2 py-1 bg-[#ffd23f]/30 border border-[#111] rounded text-[10px] font-bold text-amber-900 flex items-center">
+                      <AlertTriangle className="w-3 h-3 mr-1 shrink-0" />
+                      <span>{ev.duplicateMatch.similarity}% match to {ev.duplicateMatch.matchedEvidenceId}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Inspect Action */}
+                <button
+                  onClick={() => setInspectedItem(ev)}
+                  className="w-full py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] uppercase tracking-wider flex items-center justify-center hover-neo-sm transition-transform"
+                >
+                  <Eye className="w-4 h-4 mr-1.5" /> Inspect Analysis
+                </button>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* DESKTOP TABLE: Visible on md: and above */}
+      <div className="hidden md:block bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md overflow-x-auto">
         <table className="w-full min-w-[950px] text-left">
           <thead>
             <tr className="border-b-2 border-[#111]">
@@ -265,35 +358,36 @@ export default function EvidencePage() {
 
       {/* Evidence Detail Inspector Modal */}
       {inspectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-4xl bg-white border-2 border-[#111] rounded-[20px] neo-shadow-lg flex flex-col max-h-[92vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-4xl bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col max-h-[90vh] overflow-hidden">
             
             {/* Modal Top */}
-            <div className="flex items-center justify-between p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
-              <div className="flex items-center space-x-3">
-                <span className="font-display text-[22px] text-[#111] uppercase">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
+              <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap pr-2">
+                <span className="font-display text-[17px] sm:text-[22px] text-[#111] uppercase">
                   Evidence {inspectedItem.id}
                 </span>
-                <span className="font-mono text-[12px] bg-white border border-[#111] px-2 py-0.5 rounded font-bold">
+                <span className="font-mono text-[11px] sm:text-[12px] bg-white border border-[#111] px-2 py-0.5 rounded font-bold">
                   Claim: {inspectedItem.claimId}
                 </span>
               </div>
               <button 
                 onClick={() => setInspectedItem(null)}
-                className="w-8 h-8 flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm hover-neo-sm transition-transform"
+                className="w-10 h-10 min-w-[40px] flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm hover-neo-sm transition-transform shrink-0"
+                aria-label="Close Inspector Modal"
               >
                 <X className="w-5 h-5 text-[#111]" strokeWidth={3} />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-5 sm:space-y-6">
               
-              {/* Image & Primary Metadata */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              {/* Image & Primary Metadata (Stacked on mobile, side-by-side on desktop) */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6">
                 
-                {/* Image Section */}
+                {/* 1. Evidence Viewer (Appears FIRST) */}
                 <div className="md:col-span-7">
-                  <div className="relative aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[14px] overflow-hidden neo-shadow-sm flex items-center justify-center">
+                  <div className="relative aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[12px] sm:rounded-[14px] overflow-hidden neo-shadow-sm flex items-center justify-center">
                     <img 
                       src={inspectedItem.imageSrc || "/damage.jpg"} 
                       alt={inspectedItem.filename} 
@@ -311,9 +405,9 @@ export default function EvidencePage() {
                   </div>
                 </div>
 
-                {/* File Specs */}
+                {/* 2. Evidence Information Specs */}
                 <div className="md:col-span-5 space-y-3">
-                  <div className="bg-[#fdf9f0] border-2 border-[#111] rounded-[14px] p-4 space-y-2 text-[12px]">
+                  <div className="bg-[#fdf9f0] border-2 border-[#111] rounded-[12px] sm:rounded-[14px] p-4 space-y-2 text-[12px]">
                     <div className="flex justify-between items-center">
                       <span className="text-[#111]/70 font-medium">Source:</span>
                       <span className={`font-bold text-[11px] px-2 py-0.5 rounded border border-[#111] ${
@@ -348,7 +442,7 @@ export default function EvidencePage() {
                           <Copy className="w-3 h-3 mr-1" /> {copiedHash ? "Copied!" : "Copy"}
                         </button>
                       </div>
-                      <div className="font-mono text-[11px] p-1.5 bg-white border border-[#111] rounded break-all">
+                      <div className="font-mono text-[10px] sm:text-[11px] p-1.5 bg-white border border-[#111] rounded break-all">
                         {inspectedItem.hash}
                       </div>
                     </div>
@@ -356,15 +450,15 @@ export default function EvidencePage() {
 
                   <Link
                     href={`/dashboard/claims/${inspectedItem.claimId}`}
-                    className="w-full py-2.5 text-center bg-[#ff3d81] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] block hover-neo-sm transition-transform"
+                    className="w-full py-2.5 min-h-[44px] text-center bg-[#ff3d81] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] flex items-center justify-center hover-neo-sm transition-transform"
                   >
                     Open Associated Claim ({inspectedItem.claimId})
                   </Link>
                 </div>
               </div>
 
-              {/* Analysis Modules */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* 3. Analysis Modules: Provenance, Forensics, OCR */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
                 
                 {/* Provenance */}
                 <div className="bg-white border-2 border-[#111] rounded-[14px] p-4 neo-shadow-sm space-y-2">
@@ -426,22 +520,22 @@ export default function EvidencePage() {
                 </div>
               </div>
 
-              {/* Similar Evidence Block if matched */}
+              {/* 4. Duplicate Detection */}
               {inspectedItem.duplicateMatch && (
                 <div className="bg-[#ffd23f]/30 border-2 border-[#111] rounded-[14px] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <h4 className="font-bold text-[14px] text-[#111] flex items-center">
-                      <AlertTriangle className="w-4 h-4 mr-1.5" />
+                      <AlertTriangle className="w-4 h-4 mr-1.5 shrink-0" />
                       Similar Evidence Detected ({inspectedItem.duplicateMatch.similarity}% visual match)
                     </h4>
                     <p className="text-[12px] text-[#111]/70 mt-0.5">
                       Matches previously submitted image {inspectedItem.duplicateMatch.matchedEvidenceId} from claim {inspectedItem.duplicateMatch.matchedClaimId}.
                     </p>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 w-full sm:w-auto">
                     <Link
                       href={`/dashboard/claims/${inspectedItem.duplicateMatch.matchedClaimId}`}
-                      className="px-3.5 py-1.5 bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
+                      className="w-full sm:w-auto px-4 py-2 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] flex items-center justify-center hover-neo-sm transition-transform"
                     >
                       Open Claim
                     </Link>
@@ -455,19 +549,20 @@ export default function EvidencePage() {
 
       {/* Upload Evidence Modal */}
       {isUploadModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-lg bg-white border-2 border-[#111] rounded-[20px] neo-shadow-lg flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
-              <h3 className="font-display text-[20px] uppercase text-[#111]">Upload Evidence</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-lg bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
+              <h3 className="font-display text-[18px] sm:text-[20px] uppercase text-[#111]">Upload Evidence</h3>
               <button 
                 onClick={() => setIsUploadModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm hover-neo-sm transition-transform"
+                className="w-10 h-10 min-w-[40px] flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm hover-neo-sm transition-transform shrink-0"
+                aria-label="Close Upload Modal"
               >
-                <X className="w-4 h-4 text-[#111]" strokeWidth={3} />
+                <X className="w-5 h-5 text-[#111]" strokeWidth={3} />
               </button>
             </div>
 
-            <form onSubmit={handleUploadSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleUploadSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto">
               <div className="space-y-1.5">
                 <label className="font-bold text-[12px] uppercase tracking-wide">Attach to Claim</label>
                 <input 
@@ -476,7 +571,7 @@ export default function EvidencePage() {
                   onChange={(e) => setUploadClaimId(e.target.value)}
                   placeholder="CLM-1001"
                   required
-                  className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono text-[13px] font-bold"
+                  className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono text-[13px] font-bold"
                 />
               </div>
 
@@ -488,27 +583,27 @@ export default function EvidencePage() {
                   onChange={(e) => setUploadFilename(e.target.value)}
                   placeholder="damage.jpg"
                   required
-                  className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono text-[13px]"
+                  className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono text-[13px]"
                 />
               </div>
 
-              <div className="border-2 border-dashed border-[#111] rounded-[12px] p-6 text-center bg-[#fdf9f0]">
+              <div className="border-2 border-dashed border-[#111] rounded-[12px] p-5 sm:p-6 text-center bg-[#fdf9f0]">
                 <Camera className="w-8 h-8 text-[#111] mx-auto mb-2" strokeWidth={2.5} />
                 <p className="text-[13px] font-bold">Select image from device</p>
                 <p className="text-[11px] text-[#111]/60 mt-1">Simulated evidence ingest with C2PA analysis</p>
               </div>
 
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t-2 border-[#111]">
+              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:space-x-3 pt-3 border-t-2 border-[#111] items-stretch sm:items-center justify-end">
                 <button
                   type="button"
                   onClick={() => setIsUploadModalOpen(false)}
-                  className="px-4 py-2 bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
+                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#3ddc97] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+                  className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
                 >
                   Start Analysis
                 </button>
@@ -518,5 +613,17 @@ export default function EvidencePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function EvidencePage() {
+  return (
+    <Suspense fallback={
+      <div className="p-8 flex items-center justify-center font-mono text-[13px] font-bold">
+        Loading Evidence Explorer...
+      </div>
+    }>
+      <EvidenceContent />
+    </Suspense>
   );
 }

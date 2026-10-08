@@ -181,7 +181,7 @@ export function ExportMenu({
         type="button"
         disabled={status === "exporting" || status === "generating"}
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center px-3.5 py-2 bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform disabled:opacity-60 ${className}`}
+        className={`flex items-center px-3.5 py-2 min-h-[44px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform disabled:opacity-60 ${className}`}
       >
         {status === "exporting" || status === "generating" ? (
           <>
@@ -207,7 +207,7 @@ export function ExportMenu({
 
       {/* Error message popup */}
       {errorMessage && (
-        <div className="absolute right-0 top-12 z-50 w-64 p-2.5 bg-red-50 border-2 border-red-600 rounded-[10px] neo-shadow-sm text-[12px] font-bold text-red-700 animate-in fade-in">
+        <div className="absolute right-0 top-12 z-50 w-64 max-w-[calc(100vw-32px)] p-2.5 bg-red-50 border-2 border-red-600 rounded-[10px] neo-shadow-sm text-[12px] font-bold text-red-700 animate-in fade-in">
           <div className="flex items-start">
             <AlertCircle className="w-4 h-4 mr-1.5 shrink-0 mt-0.5" />
             <span>{errorMessage}</span>
@@ -217,18 +217,18 @@ export function ExportMenu({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border-2 border-[#111] rounded-[12px] neo-shadow-md z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+        <div className="absolute right-0 mt-2 w-48 max-w-[calc(100vw-32px)] bg-white border-2 border-[#111] rounded-[12px] neo-shadow-md z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
           <div className="p-1.5 space-y-1">
             <button
               onClick={() => handleExport("pdf")}
-              className="w-full flex items-center px-3 py-2 text-[12px] font-bold text-[#111] rounded-[8px] hover:bg-[#ff3d81] transition-colors"
+              className="w-full flex items-center px-3 py-2.5 min-h-[40px] text-[12px] font-bold text-[#111] rounded-[8px] hover:bg-[#ff3d81] transition-colors"
             >
               <FileDown className="w-4 h-4 mr-2" strokeWidth={2.5} />
               Export as PDF
             </button>
             <button
               onClick={() => handleExport("csv")}
-              className="w-full flex items-center px-3 py-2 text-[12px] font-bold text-[#111] rounded-[8px] hover:bg-[#ffd23f] transition-colors"
+              className="w-full flex items-center px-3 py-2.5 min-h-[40px] text-[12px] font-bold text-[#111] rounded-[8px] hover:bg-[#ffd23f] transition-colors"
             >
               <FileSpreadsheet className="w-4 h-4 mr-2" strokeWidth={2.5} />
               Export as CSV
@@ -236,7 +236,7 @@ export function ExportMenu({
             <div className="border-t border-[#111]/15 my-1" />
             <button
               onClick={() => setIsOpen(false)}
-              className="w-full flex items-center px-3 py-1.5 text-[11px] font-bold text-[#111]/70 rounded-[8px] hover:bg-gray-100 transition-colors"
+              className="w-full flex items-center px-3 py-2 min-h-[36px] text-[11px] font-bold text-[#111]/70 rounded-[8px] hover:bg-gray-100 transition-colors"
             >
               <X className="w-3.5 h-3.5 mr-1.5" />
               Cancel

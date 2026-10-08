@@ -105,7 +105,7 @@ function ClaimDetailContent() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
             <ExportMenu type="claim_detail" claimId={claim.id} buttonLabel="Export Dossier PDF" />
 
             <button 
@@ -114,13 +114,13 @@ function ClaimDetailContent() {
                 setDecisionReason("Please provide an unedited photo showing the package label alongside the affected item.");
                 setIsReviewModalOpen(true);
               }}
-              className="px-4 py-2 bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+              className="px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform text-center"
             >
               Request More Evidence
             </button>
             <button 
               onClick={() => setIsReviewModalOpen(true)}
-              className="px-5 py-2 bg-[#ff3d81] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+              className="px-5 py-2.5 min-h-[44px] bg-[#ff3d81] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform text-center"
             >
               Open Review
             </button>
@@ -349,22 +349,22 @@ function ClaimDetailContent() {
 
       {/* Review Modal */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-xl bg-white border-2 border-[#111] rounded-[20px] neo-shadow-lg flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#111]/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-xl max-w-[calc(100vw-24px)] max-h-[90vh] bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
               <div>
-                <h3 className="font-display text-[20px] uppercase text-[#111]">Claim Review: {claim.id}</h3>
-                <p className="text-[12px] text-[#111]/70 font-medium">Record human reviewer determination and audit reason.</p>
+                <h3 className="font-display text-[17px] sm:text-[20px] uppercase text-[#111]">Claim Review: {claim.id}</h3>
+                <p className="text-[11px] sm:text-[12px] text-[#111]/70 font-medium">Record human reviewer determination and audit reason.</p>
               </div>
               <button 
                 onClick={() => setIsReviewModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm hover-neo-sm transition-transform"
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm hover-neo-sm transition-transform shrink-0"
               >
                 <X className="w-4 h-4 text-[#111]" strokeWidth={3} />
               </button>
             </div>
 
-            <form onSubmit={handleDecisionSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleDecisionSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto">
               {actionDoneMsg && (
                 <div className="p-3 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] flex items-center text-[13px] font-bold">
                   <CheckCircle2 className="w-5 h-5 mr-2" />
@@ -374,7 +374,7 @@ function ClaimDetailContent() {
 
               <div>
                 <label className="font-bold text-[12px] uppercase tracking-wide block mb-2">Review Decision</label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
                     { label: "Approve Refund", value: "Approved", color: "hover:bg-[#3ddc97]" },
                     { label: "Partial Refund", value: "Approved", color: "hover:bg-[#ffd23f]" },
@@ -386,7 +386,7 @@ function ClaimDetailContent() {
                       type="button"
                       key={i}
                       onClick={() => setSelectedDecision(btn.value as any)}
-                      className={`p-2.5 border-2 border-[#111] rounded-[10px] font-bold text-[12px] text-left transition-all ${
+                      className={`p-3 min-h-[44px] border-2 border-[#111] rounded-[10px] font-bold text-[13px] text-left transition-all ${
                         selectedDecision === btn.value ? "bg-[#111] text-white neo-shadow-sm" : `bg-white text-[#111] ${btn.color}`
                       }`}
                     >
@@ -404,21 +404,21 @@ function ClaimDetailContent() {
                   value={decisionReason}
                   onChange={(e) => setDecisionReason(e.target.value)}
                   placeholder="State the justification for this decision (required for audit compliance)..."
-                  className="w-full p-3 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px] font-medium focus:outline-none focus:bg-white resize-none"
+                  className="w-full p-3 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px] font-medium focus:outline-none focus:bg-white resize-none" 
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t-2 border-[#111]">
+              <div className="flex flex-col-reverse sm:flex-row gap-2 sm:space-x-3 pt-3 border-t-2 border-[#111] items-stretch sm:items-center justify-end">
                 <button
                   type="button"
                   onClick={() => setIsReviewModalOpen(false)}
-                  className="px-4 py-2 bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
+                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+                  className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
                 >
                   Confirm Decision
                 </button>

@@ -3,9 +3,11 @@ import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ type: string }> }
+  { params }: { params: Promise<{ type: string[] | string }> }
 ) {
-  const { type: filename } = await params;
+  const resolvedParams = await params;
+  const rawType = resolvedParams.type;
+  const filename = Array.isArray(rawType) ? rawType.join("/") : (rawType || "overview.pdf");
   const searchParams = request.nextUrl.searchParams;
   const dateRange = searchParams.get("date_range") || "Last 30 days";
 
@@ -22,7 +24,7 @@ export async function GET(
       if (backendRes.ok) {
         const data = await backendRes.arrayBuffer();
         const contentType = backendRes.headers.get("content-type") || (filename.endsWith(".pdf") ? "application/pdf" : "text/csv");
-        const disposition = backendRes.headers.get("content-disposition") || `attachment; filename="${filename}"`;
+        const disposition = backendRes.headers.get("content-disposition") || `attachment; filename="${filename.split("/").pop()}"`;
         return new NextResponse(data, {
           status: 200,
           headers: {
@@ -36,6 +38,8 @@ export async function GET(
     }
   }
 
+  const cleanFilename = filename.split("/").pop() || filename;
+
   // 2. Generate Real CSV if CSV format requested
   if (filename.endsWith(".csv")) {
     const csvContent = generateCsvData(filename);
@@ -43,7 +47,7 @@ export async function GET(
       status: 200,
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="trustlens-${filename}"`,
+        "Content-Disposition": `attachment; filename="trustlens-${cleanFilename}"`,
       },
     });
   }
@@ -55,7 +59,7 @@ export async function GET(
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="trustlens-${filename}"`,
+        "Content-Disposition": `attachment; filename="trustlens-${cleanFilename}"`,
       },
     });
   } catch (error) {
@@ -179,6 +183,10 @@ async function generateServerlessPdf(filename: string, dateRange: string): Promi
   } else if (filename.includes("evidence")) {
     title = "Evidence Artifact Registry";
     subtitle = `Forensic evidence inventory and verification status • ${dateRange}`;
+  } else if (filename.includes("claims")) {
+    const claimPart = filename.split("/").pop() || "Dossier";
+    title = `Claim Dossier Report: ${claimPart.replace(".pdf", "")}`;
+    subtitle = `Evidence verification signals and risk assessment dossier • ${dateRange}`;
   }
 
   page.drawText(title, {
@@ -326,7 +334,7 @@ async function generateServerlessPdf(filename: string, dateRange: string): Promi
 
   page.drawText("Category", { x: 62, y: y + 1, size: 8, font: fontBold, color: rgb(1, 1, 1) });
   page.drawText("Share (%)", { x: 210, y: y + 1, size: 8, font: fontBold, color: rgb(1, 1, 1) });
-  page.drawText("Average Risk", { x: 280, y: y + 1, size: 8, font: fontBold, color: rgb(1, 1, 1) });
+  page.drawText("Average Risk", { x: 280, y: y + 1, size: 8, font: fontBold, color: primaryColor });
   page.drawText("Primary Signal", { x: 360, y: y + 1, size: 8, font: fontBold, color: rgb(1, 1, 1) });
 
   y -= 18;

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { 
   Settings, 
   Key, 
@@ -17,18 +18,54 @@ import {
   Trash2, 
   CheckCircle2, 
   X,
-  Layers
+  Layers,
+  Users,
+  AlertTriangle,
+  ArrowRight
 } from "lucide-react";
+import Link from "next/link";
 import { useTrustLens } from "@/lib/store";
 import { ExportMenu } from "@/components/ui/export-menu";
 import { apiUrl } from "@/lib/api";
 
-export default function SettingsPage() {
-  const { auditLogs, addAuditLog } = useTrustLens();
+type TabType = 
+  | "General" 
+  | "Customers" 
+  | "Organization" 
+  | "Risk Engine" 
+  | "Evidence" 
+  | "Notifications" 
+  | "Security" 
+  | "API" 
+  | "Webhooks" 
+  | "Audit Logs";
 
-  const [activeTab, setActiveTab] = useState<
-    "General" | "Organization" | "Risk Engine" | "Evidence" | "Notifications" | "Security" | "API" | "Webhooks" | "Audit Logs"
-  >("General");
+const CUSTOMERS_DATA = [
+  { id: "CUST-821", name: "Rahul Sharma", claimsCount: 3, highRiskCount: 1, trustScore: 78, disputedTotal: "₹2,499", status: "Verified", platform: "Food Delivery" },
+  { id: "CUST-402", name: "Ananya Mukherjee", claimsCount: 1, highRiskCount: 0, trustScore: 94, disputedTotal: "₹840", status: "Trusted", platform: "Quick Commerce" },
+  { id: "CUST-912", name: "Vikram Teja", claimsCount: 6, highRiskCount: 5, trustScore: 18, disputedTotal: "₹18,400", status: "Flagged (Abuse Ring)", platform: "E-Commerce" },
+  { id: "CUST-118", name: "Sneha Kulkarni", claimsCount: 2, highRiskCount: 0, trustScore: 88, disputedTotal: "₹1,299", status: "Verified", platform: "Food Delivery" },
+  { id: "CUST-673", name: "Arun Prakash", claimsCount: 4, highRiskCount: 2, trustScore: 42, disputedTotal: "₹6,150", status: "Watchlist", platform: "Logistics" },
+];
+
+function SettingsContent() {
+  const { auditLogs, addAuditLog } = useTrustLens();
+  const searchParams = useSearchParams();
+
+  const [activeTab, setActiveTab] = useState<TabType>("General");
+
+  // Sync with search parameter tab (?tab=customers, ?tab=organizations, ?tab=api_keys, etc.)
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (!tab) return;
+    const lower = tab.toLowerCase();
+    if (lower === "customers") setActiveTab("Customers");
+    else if (lower === "organizations" || lower === "organization") setActiveTab("Organization");
+    else if (lower === "api_keys" || lower === "api-keys" || lower === "api") setActiveTab("API");
+    else if (lower === "webhooks" || lower === "webhook") setActiveTab("Webhooks");
+    else if (lower === "audit_logs" || lower === "audit-logs") setActiveTab("Audit Logs");
+    else if (lower === "risk_engine" || lower === "risk-engine") setActiveTab("Risk Engine");
+  }, [searchParams]);
 
   // General Settings State
   const [orgName, setOrgName] = useState("TrustLens Technologies Inc.");
@@ -172,19 +209,19 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
         <div>
-          <h1 className="font-display text-[28px] text-[#111] uppercase tracking-tight flex items-center">
-            <Settings className="w-7 h-7 mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
-            Settings
+          <h1 className="font-display text-[24px] sm:text-[28px] text-[#111] uppercase tracking-tight flex items-center">
+            <Settings className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
+            Settings &amp; Administration
           </h1>
-          <p className="text-[14px] text-[#111]/70 font-medium">
-            Manage organization, risk engine parameters, webhooks, and developer keys.
+          <p className="text-[13px] sm:text-[14px] text-[#111]/70 font-medium">
+            Manage customers, organizations, risk weights, webhooks, and developer keys.
           </p>
         </div>
 
         {saveSuccessMsg && (
           <div className="px-3.5 py-1.5 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] flex items-center animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 mr-1.5" />
-            {saveSuccessMsg}
+            <CheckCircle2 className="w-4 h-4 mr-1.5 shrink-0" />
+            <span>{saveSuccessMsg}</span>
           </div>
         )}
       </div>
@@ -193,6 +230,7 @@ export default function SettingsPage() {
       <div className="flex items-center space-x-1.5 overflow-x-auto border-b-2 border-[#111] pb-2.5 pt-1 scrollbar-thin scrollbar-thumb-[#111]/20">
         {[
           { id: "General", label: "General", icon: Building2 },
+          { id: "Customers", label: "Customers", icon: Users },
           { id: "Organization", label: "Organization", icon: Building2 },
           { id: "Risk Engine", label: "Risk Engine", icon: Sliders },
           { id: "Evidence", label: "Evidence", icon: Layers },
@@ -205,13 +243,13 @@ export default function SettingsPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center px-3.5 py-2 rounded-[10px] border-2 border-[#111] font-bold text-[12px] whitespace-nowrap transition-transform shrink-0 ${
+            className={`flex items-center px-3.5 py-2 min-h-[44px] rounded-[10px] border-2 border-[#111] font-bold text-[12px] whitespace-nowrap transition-transform shrink-0 ${
               activeTab === tab.id
                 ? "bg-[#ff3d81] text-[#111] neo-shadow-sm"
                 : "bg-white text-[#111] hover:bg-[#fdf9f0]"
             }`}
           >
-            <tab.icon className="w-3.5 h-3.5 mr-1.5" strokeWidth={2.5} />
+            <tab.icon className="w-3.5 h-3.5 mr-1.5 shrink-0" strokeWidth={2.5} />
             {tab.label}
           </button>
         ))}
@@ -219,10 +257,10 @@ export default function SettingsPage() {
 
       {/* TAB CONTENT: 1. General */}
       {activeTab === "General" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md max-w-4xl space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-4xl space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold text-[18px] text-[#111]">General Configuration</h2>
-            <span className="text-[11px] font-mono text-[#111]/60 font-bold">ORGANIZATION SETTINGS</span>
+            <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">General Configuration</h2>
+            <span className="text-[11px] font-mono text-[#111]/60 font-bold">WORKSPACE DEFAULTS</span>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -232,7 +270,7 @@ export default function SettingsPage() {
                 type="text" 
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
-                className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white" 
+                className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white" 
               />
             </div>
 
@@ -242,7 +280,7 @@ export default function SettingsPage() {
                 type="text" 
                 disabled
                 value={orgId}
-                className="w-full p-2.5 bg-[#eee] border-2 border-[#111] rounded-[10px] font-mono text-[13px] text-[#111]/60" 
+                className="w-full p-2.5 min-h-[44px] bg-[#eee] border-2 border-[#111] rounded-[10px] font-mono text-[13px] text-[#111]/60" 
               />
             </div>
 
@@ -251,7 +289,7 @@ export default function SettingsPage() {
               <select 
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
+                className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
               >
                 <option value="Asia/Kolkata (IST +05:30)">Asia/Kolkata (IST +05:30)</option>
                 <option value="America/New_York (EST -05:00)">America/New_York (EST -05:00)</option>
@@ -265,7 +303,7 @@ export default function SettingsPage() {
               <select 
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
+                className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
               >
                 <option value="INR (₹)">INR (₹)</option>
                 <option value="USD ($)">USD ($)</option>
@@ -278,7 +316,7 @@ export default function SettingsPage() {
           <div className="pt-2 border-t-2 border-[#111]/10 flex items-center justify-between flex-wrap gap-3">
             <button
               onClick={() => triggerSaveNotice("General settings saved successfully.")}
-              className="px-5 py-2.5 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
+              className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
             >
               Save Changes
             </button>
@@ -301,7 +339,7 @@ export default function SettingsPage() {
                 type="button"
                 disabled={isResettingDemo}
                 onClick={handleResetDemo}
-                className="px-4 py-2 bg-[#ff6b5e] text-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-[#ff6b5e] text-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform disabled:opacity-50"
               >
                 {isResettingDemo ? "Purging Demo Records..." : "Reset Demo Data"}
               </button>
@@ -315,18 +353,91 @@ export default function SettingsPage() {
         </div>
       )}
 
+      {/* TAB CONTENT: CUSTOMERS & RECIDIVISM INTELLIGENCE */}
+      {activeTab === "Customers" && (
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md space-y-5">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111] flex items-center">
+                <Users className="w-5 h-5 mr-2 text-[#ff3d81]" />
+                Customer Profiles &amp; Recidivism Intelligence
+              </h2>
+              <p className="text-[12px] text-[#111]/60 font-medium">
+                Track repeated claimants, account anomaly index, and historical dispute behavior.
+              </p>
+            </div>
+            <span className="font-mono text-[11px] font-bold px-2.5 py-1 bg-[#ffd23f] border-2 border-[#111] rounded">
+              5 MONITORED ACCOUNTS
+            </span>
+          </div>
+
+          <div className="border-2 border-[#111] rounded-[12px] overflow-hidden overflow-x-auto w-full">
+            <table className="w-full text-left min-w-[750px]">
+              <thead>
+                <tr className="bg-[#fdf9f0] border-b-2 border-[#111]">
+                  <th className="p-3 font-mono text-[11px] font-bold uppercase">Customer ID</th>
+                  <th className="p-3 font-mono text-[11px] font-bold uppercase">Name</th>
+                  <th className="p-3 font-mono text-[11px] font-bold uppercase">Platform</th>
+                  <th className="p-3 font-mono text-[11px] font-bold uppercase text-center">Claims Filed</th>
+                  <th className="p-3 font-mono text-[11px] font-bold uppercase text-center">High Risk</th>
+                  <th className="p-3 font-mono text-[11px] font-bold uppercase">Trust Score</th>
+                  <th className="p-3 font-mono text-[11px] font-bold uppercase text-right">Total Disputed</th>
+                  <th className="p-3 font-mono text-[11px] font-bold uppercase">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CUSTOMERS_DATA.map((cust) => (
+                  <tr key={cust.id} className="border-b border-[#111]/10 text-[13px] hover:bg-[#fdf9f0] transition-colors">
+                    <td className="p-3 font-mono font-bold text-[#111]">{cust.id}</td>
+                    <td className="p-3 font-semibold text-[#111]">{cust.name}</td>
+                    <td className="p-3 text-[12px] text-[#111]/70">{cust.platform}</td>
+                    <td className="p-3 font-mono text-center font-bold">{cust.claimsCount}</td>
+                    <td className="p-3 font-mono text-center">
+                      <span className={`px-2 py-0.5 rounded-full border border-[#111] text-[10px] font-bold ${
+                        cust.highRiskCount > 0 ? "bg-[#ff3d81] text-[#111]" : "bg-white text-[#111]"
+                      }`}>
+                        {cust.highRiskCount}
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      <span className={`font-mono font-bold text-[11px] px-2 py-0.5 rounded border border-[#111] ${
+                        cust.trustScore > 75 ? "bg-[#3ddc97]" : cust.trustScore > 40 ? "bg-[#ffd23f]" : "bg-[#c8a2ff]"
+                      }`}>
+                        {cust.trustScore}/100
+                      </span>
+                    </td>
+                    <td className="p-3 font-mono text-right font-bold text-[#111]">{cust.disputedTotal}</td>
+                    <td className="p-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full border border-[#111] text-[10px] font-bold uppercase ${
+                        cust.status.includes("Flagged") ? "bg-[#ff6b5e] text-white" :
+                        cust.status === "Watchlist" ? "bg-[#ffd23f] text-[#111]" : "bg-[#3ddc97] text-[#111]"
+                      }`}>
+                        {cust.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* TAB CONTENT: 2. Organization */}
       {activeTab === "Organization" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md max-w-3xl space-y-5">
-          <div className="flex items-center justify-between">
-            <h2 className="font-bold text-[18px] text-[#111]">Team Members & Access</h2>
-            <button className="px-3.5 py-1.5 bg-[#ffd23f] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-4xl space-y-5">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Team Members &amp; Access Controls</h2>
+              <p className="text-[12px] text-[#111]/60 font-medium">Manage reviewer roles, permissions, and audit assignments.</p>
+            </div>
+            <button className="w-full sm:w-auto px-4 py-2 min-h-[44px] bg-[#ffd23f] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform">
               + Invite Member
             </button>
           </div>
 
-          <div className="border-2 border-[#111] rounded-[12px] overflow-hidden">
-            <table className="w-full text-left">
+          <div className="border-2 border-[#111] rounded-[12px] overflow-hidden overflow-x-auto w-full">
+            <table className="w-full text-left min-w-[650px]">
               <thead>
                 <tr className="bg-[#fdf9f0] border-b-2 border-[#111]">
                   <th className="p-3 font-mono text-[11px] font-bold uppercase">Name</th>
@@ -356,9 +467,9 @@ export default function SettingsPage() {
 
       {/* TAB CONTENT: 3. Risk Engine */}
       {activeTab === "Risk Engine" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md max-w-2xl space-y-6">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-2xl space-y-6">
           <div>
-            <h2 className="font-bold text-[18px] text-[#111]">Risk Configuration</h2>
+            <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Risk Configuration</h2>
             <p className="text-[12px] text-[#111]/60 font-medium">
               Adjust multi-signal weights for automated scoring (Sum must equal 100%).
             </p>
@@ -388,19 +499,19 @@ export default function SettingsPage() {
                   max="50" 
                   value={sig.value} 
                   onChange={(e) => sig.set(Number(e.target.value))}
-                  className="w-full accent-[#ff3d81] cursor-pointer"
+                  className="w-full accent-[#ff3d81] cursor-pointer" 
                 />
               </div>
             ))}
           </div>
 
-          <div className="pt-3 border-t-2 border-[#111] flex items-center justify-between">
+          <div className="pt-3 border-t-2 border-[#111] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <span className="font-mono text-[12px] font-bold">
               TOTAL WEIGHT: {provenanceWeight + forensicsWeight + duplicateWeight + orderMismatchWeight + behaviourWeight}%
             </span>
             <button
               onClick={() => triggerSaveNotice("Risk Engine weights calibrated and saved.")}
-              className="px-5 py-2.5 bg-[#ffd23f] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
+              className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#ffd23f] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
             >
               Save Configuration
             </button>
@@ -410,8 +521,8 @@ export default function SettingsPage() {
 
       {/* TAB CONTENT: 4. Evidence */}
       {activeTab === "Evidence" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md max-w-2xl space-y-5">
-          <h2 className="font-bold text-[18px] text-[#111]">Evidence Ingestion Rules</h2>
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-2xl space-y-5">
+          <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Evidence Ingestion Rules</h2>
           <div className="space-y-3 text-[13px]">
             <div className="p-3 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] flex justify-between items-center">
               <div>
@@ -437,7 +548,7 @@ export default function SettingsPage() {
           </div>
           <button 
             onClick={() => triggerSaveNotice("Evidence rules updated.")}
-            className="px-5 py-2.5 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px]"
+            className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px]"
           >
             Save Rules
           </button>
@@ -446,8 +557,8 @@ export default function SettingsPage() {
 
       {/* TAB CONTENT: 5. Notifications */}
       {activeTab === "Notifications" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md max-w-2xl space-y-5">
-          <h2 className="font-bold text-[18px] text-[#111]">Alerts & Escalations</h2>
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-2xl space-y-5">
+          <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Alerts &amp; Escalations</h2>
           <div className="space-y-3 text-[13px]">
             {[
               { title: "Critical Risk Escalation", sub: "Trigger urgent Slack webhook when claim risk exceeds 85/100", active: true },
@@ -465,7 +576,7 @@ export default function SettingsPage() {
           </div>
           <button 
             onClick={() => triggerSaveNotice("Notification channels saved.")}
-            className="px-5 py-2.5 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px]"
+            className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px]"
           >
             Save Preferences
           </button>
@@ -474,8 +585,8 @@ export default function SettingsPage() {
 
       {/* TAB CONTENT: 6. Security */}
       {activeTab === "Security" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md max-w-2xl space-y-5">
-          <h2 className="font-bold text-[18px] text-[#111]">Security & Governance</h2>
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-2xl space-y-5">
+          <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Security &amp; Governance</h2>
           <div className="space-y-3 text-[13px]">
             <div className="p-3 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] flex justify-between items-center">
               <div>
@@ -497,21 +608,21 @@ export default function SettingsPage() {
 
       {/* TAB CONTENT: 7. API Keys */}
       {activeTab === "API" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md space-y-5">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
-              <h2 className="font-bold text-[18px] text-[#111]">API Keys</h2>
+              <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">API Keys</h2>
               <p className="text-[12px] text-[#111]/60 font-medium">Create and manage API access for your claims ingestion backend.</p>
             </div>
             <button 
               onClick={() => { setGeneratedSecret(null); setNewKeyName(""); setIsApiKeyModalOpen(true); }}
-              className="flex items-center px-4 py-2 bg-[#ffd23f] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
+              className="w-full sm:w-auto flex items-center justify-center px-4 py-2 min-h-[44px] bg-[#ffd23f] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
             >
               <Plus className="w-4 h-4 mr-1.5" strokeWidth={3} /> + Create API Key
             </button>
           </div>
 
-          <div className="border-2 border-[#111] rounded-[12px] overflow-hidden overflow-x-auto">
+          <div className="border-2 border-[#111] rounded-[12px] overflow-hidden overflow-x-auto w-full">
             <table className="w-full text-left min-w-[700px]">
               <thead>
                 <tr className="bg-[#fdf9f0] border-b-2 border-[#111]">
@@ -539,6 +650,7 @@ export default function SettingsPage() {
                       <button 
                         onClick={() => setApiKeys(apiKeys.filter(x => x.id !== k.id))}
                         className="p-1 hover:bg-[#ff6b5e]/20 rounded text-[#ff3d81]"
+                        aria-label="Delete API Key"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -549,16 +661,20 @@ export default function SettingsPage() {
             </table>
           </div>
 
-          {/* Modal */}
+          {/* Create API Key Modal */}
           {isApiKeyModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
-              <div className="w-full max-w-md bg-white border-2 border-[#111] rounded-[20px] neo-shadow-lg p-6 space-y-4">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+              <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-md bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center border-b-2 border-[#111] pb-3">
-                  <h3 className="font-display text-[18px] uppercase">
+                  <h3 className="font-display text-[17px] sm:text-[18px] uppercase">
                     {generatedSecret ? "API Key Created" : "Create API Key"}
                   </h3>
-                  <button onClick={() => setIsApiKeyModalOpen(false)} className="w-7 h-7 flex items-center justify-center bg-[#ff3d81] border border-[#111] rounded">
-                    <X className="w-4 h-4" />
+                  <button 
+                    onClick={() => setIsApiKeyModalOpen(false)} 
+                    className="w-10 h-10 min-w-[40px] flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px]"
+                    aria-label="Close API Key Modal"
+                  >
+                    <X className="w-4 h-4 text-[#111]" strokeWidth={2.5} />
                   </button>
                 </div>
 
@@ -572,12 +688,23 @@ export default function SettingsPage() {
                         value={newKeyName}
                         onChange={(e) => setNewKeyName(e.target.value)}
                         placeholder="e.g. FastAPI Ingestion Worker"
-                        className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px]"
+                        className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px]"
                       />
                     </div>
-                    <div className="flex justify-end space-x-2 pt-2">
-                      <button type="button" onClick={() => setIsApiKeyModalOpen(false)} className="px-3 py-1.5 bg-white border-2 border-[#111] rounded font-bold text-[12px]">Cancel</button>
-                      <button type="submit" className="px-4 py-1.5 bg-[#3ddc97] border-2 border-[#111] rounded font-bold text-[12px]">Generate Secret</button>
+                    <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2 items-stretch sm:items-center justify-end">
+                      <button 
+                        type="button" 
+                        onClick={() => setIsApiKeyModalOpen(false)} 
+                        className="w-full sm:w-auto px-4 py-2 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit" 
+                        className="w-full sm:w-auto px-4 py-2 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
+                      >
+                        Generate Secret
+                      </button>
                     </div>
                   </form>
                 ) : (
@@ -589,14 +716,14 @@ export default function SettingsPage() {
                       <span>{generatedSecret}</span>
                       <button 
                         onClick={() => { navigator.clipboard.writeText(generatedSecret); setCopiedKey(true); }}
-                        className="ml-2 px-2.5 py-1 bg-white border border-[#111] rounded font-sans font-bold text-[11px] shrink-0"
+                        className="ml-2 px-3 py-1.5 min-h-[36px] bg-white border border-[#111] rounded font-sans font-bold text-[11px] shrink-0"
                       >
                         {copiedKey ? "Copied!" : "Copy"}
                       </button>
                     </div>
                     <button 
                       onClick={() => setIsApiKeyModalOpen(false)} 
-                      className="w-full py-2 bg-[#ff3d81] border-2 border-[#111] rounded-[10px] font-bold text-[12px]"
+                      className="w-full py-2.5 min-h-[44px] bg-[#ff3d81] border-2 border-[#111] rounded-[10px] font-bold text-[12px]"
                     >
                       I Have Saved This Key
                     </button>
@@ -610,21 +737,21 @@ export default function SettingsPage() {
 
       {/* TAB CONTENT: 8. Webhooks */}
       {activeTab === "Webhooks" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md space-y-5">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
-              <h2 className="font-bold text-[18px] text-[#111]">Outbound Webhooks</h2>
+              <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Outbound Webhooks</h2>
               <p className="text-[12px] text-[#111]/60 font-medium">Real-time HTTP callbacks for automated workflow dispatch.</p>
             </div>
             <button 
               onClick={() => setIsWebhookModalOpen(true)}
-              className="flex items-center px-4 py-2 bg-[#c8a2ff] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
+              className="w-full sm:w-auto flex items-center justify-center px-4 py-2 min-h-[44px] bg-[#c8a2ff] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
             >
               <Plus className="w-4 h-4 mr-1.5" strokeWidth={3} /> + Add Webhook
             </button>
           </div>
 
-          <div className="border-2 border-[#111] rounded-[12px] overflow-hidden overflow-x-auto">
+          <div className="border-2 border-[#111] rounded-[12px] overflow-hidden overflow-x-auto w-full">
             <table className="w-full text-left min-w-[700px]">
               <thead>
                 <tr className="bg-[#fdf9f0] border-b-2 border-[#111]">
@@ -661,12 +788,16 @@ export default function SettingsPage() {
 
           {/* Add Webhook Modal */}
           {isWebhookModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
-              <div className="w-full max-w-lg bg-white border-2 border-[#111] rounded-[20px] neo-shadow-lg p-6 space-y-4">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+              <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-lg bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center border-b-2 border-[#111] pb-3">
-                  <h3 className="font-display text-[18px] uppercase">Add Webhook Endpoint</h3>
-                  <button onClick={() => setIsWebhookModalOpen(false)} className="w-7 h-7 flex items-center justify-center bg-[#ff3d81] border border-[#111] rounded">
-                    <X className="w-4 h-4" />
+                  <h3 className="font-display text-[17px] sm:text-[18px] uppercase">Add Webhook Endpoint</h3>
+                  <button 
+                    onClick={() => setIsWebhookModalOpen(false)} 
+                    className="w-10 h-10 min-w-[40px] flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px]"
+                    aria-label="Close Webhook Modal"
+                  >
+                    <X className="w-4 h-4 text-[#111]" strokeWidth={2.5} />
                   </button>
                 </div>
 
@@ -679,13 +810,13 @@ export default function SettingsPage() {
                       value={newEndpoint}
                       onChange={(e) => setNewEndpoint(e.target.value)}
                       placeholder="https://api.yourdomain.com/webhooks/trustlens"
-                      className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px] font-mono"
+                      className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px] font-mono"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="font-bold text-[12px] uppercase">Events to Deliver</label>
-                    <div className="grid grid-cols-2 gap-2 text-[12px]">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px]">
                       {[
                         "claim.created", 
                         "evidence.uploaded", 
@@ -693,22 +824,33 @@ export default function SettingsPage() {
                         "risk.calculated", 
                         "review.completed"
                       ].map((ev) => (
-                        <label key={ev} className="flex items-center space-x-2 p-2 bg-[#fdf9f0] border border-[#111] rounded cursor-pointer">
+                        <label key={ev} className="flex items-center space-x-2 p-2.5 min-h-[44px] bg-[#fdf9f0] border border-[#111] rounded-[8px] cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={selectedEvents.includes(ev)} 
                             onChange={() => toggleEvent(ev)}
-                            className="accent-[#ff3d81]"
+                            className="w-4 h-4 accent-[#ff3d81]"
                           />
-                          <span className="font-mono">{ev}</span>
+                          <span className="font-mono text-[11px] font-semibold">{ev}</span>
                         </label>
                       ))}
                     </div>
                   </div>
 
-                  <div className="flex justify-end space-x-2 pt-2 border-t-2 border-[#111]">
-                    <button type="button" onClick={() => setIsWebhookModalOpen(false)} className="px-3 py-1.5 bg-white border-2 border-[#111] rounded font-bold text-[12px]">Cancel</button>
-                    <button type="submit" className="px-4 py-1.5 bg-[#3ddc97] border-2 border-[#111] rounded font-bold text-[12px]">Register Webhook</button>
+                  <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2 border-t-2 border-[#111] items-stretch sm:items-center justify-end">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsWebhookModalOpen(false)} 
+                      className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit" 
+                      className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
+                    >
+                      Register Webhook
+                    </button>
                   </div>
                 </form>
               </div>
@@ -719,16 +861,16 @@ export default function SettingsPage() {
 
       {/* TAB CONTENT: 9. Audit Logs */}
       {activeTab === "Audit Logs" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md space-y-5">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
-              <h2 className="font-bold text-[18px] text-[#111]">Compliance & Audit Logs</h2>
+              <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Compliance &amp; Audit Logs</h2>
               <p className="text-[12px] text-[#111]/60 font-medium">Immutable audit trail of user and machine interactions.</p>
             </div>
             <ExportMenu type="audit_logs" buttonLabel="Export Audit PDF" />
           </div>
 
-          <div className="border-2 border-[#111] rounded-[12px] overflow-hidden overflow-x-auto">
+          <div className="border-2 border-[#111] rounded-[12px] overflow-hidden overflow-x-auto w-full">
             <table className="w-full text-left min-w-[800px]">
               <thead>
                 <tr className="bg-[#fdf9f0] border-b-2 border-[#111]">
@@ -763,5 +905,17 @@ export default function SettingsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-8 flex items-center justify-center font-mono text-[13px] font-bold">
+        Loading Platform Settings...
+      </div>
+    }>
+      <SettingsContent />
+    </Suspense>
   );
 }

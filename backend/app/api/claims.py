@@ -2,7 +2,7 @@ import os
 import uuid
 import hashlib
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
 from sqlalchemy.orm import Session
 from PIL import Image as PILImage
@@ -10,8 +10,13 @@ from PIL import Image as PILImage
 from app.database import get_db
 from app.models.models import (
     Claim, ClaimEvidence, ReviewAction, AuditLog, 
-    ProvenanceResult, ForensicResult, DuplicateResult, RiskScore
+    ProvenanceResult, ForensicResult, DuplicateResult, RiskScore, Order, Customer
 )
+from app.engines.forensics.analyzer import analyze_image_forensics
+from app.engines.duplicate.analyzer import analyze_duplicate_evidence
+from app.engines.provenance.analyzer import analyze_provenance
+from app.engines.behaviour.analyzer import analyze_customer_behaviour
+from app.engines.risk.analyzer import calculate_evidence_risk
 
 router = APIRouter()
 
@@ -20,6 +25,9 @@ if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
 else:
     UPLOAD_DIR = os.path.abspath(os.path.join(os.getcwd(), "uploads"))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+DEMO_DIR = os.path.abspath(os.path.join(os.getcwd(), "..", "frontend", "public", "demo-evidence"))
+
 
 # =========================================================================
 # GET CLAIMS (with filtering)
@@ -87,9 +95,14 @@ def get_claim(claim_id: str, db: Session = Depends(get_db)):
 
     evidence = db.query(ClaimEvidence).filter(ClaimEvidence.claim_id == claim.id).all()
     audit_logs = db.query(AuditLog).filter(AuditLog.claim_id == claim.id).order_by(AuditLog.created_at.desc()).all()
+    risk_detail = db.query(RiskScore).filter(RiskScore.claim_id == claim.id).first()
 
     evidence_list = []
     for ev in evidence:
+        prov = db.query(ProvenanceResult).filter(ProvenanceResult.evidence_id == ev.id).first()
+        foren = db.query(ForensicResult).filter(ForensicResult.evidence_id == ev.id).first()
+        dup = db.query(DuplicateResult).filter(DuplicateResult.evidence_id == ev.id).first()
+
         evidence_list.append({
             "id": ev.id,
             "file_name": ev.file_name,
@@ -101,7 +114,23 @@ def get_claim(claim_id: str, db: Session = Depends(get_db)):
             "height": ev.height,
             "source_type": ev.source_type,
             "status": ev.processing_status,
-            "uploaded_at": ev.uploaded_at.isoformat() if ev.uploaded_at else None
+            "uploaded_at": ev.uploaded_at.isoformat() if ev.uploaded_at else None,
+            "provenance": {
+                "c2pa_detected": prov.c2pa_outcome == "DETECTED" if prov else False,
+                "c2pa_issuer": prov.c2pa_issuer if prov else None,
+                "validation_state": prov.c2pa_validation_state if prov else "UNKNOWN"
+            } if prov else None,
+            "forensics": {
+                "metadata_anomaly": foren.metadata_anomaly if foren else False,
+                "possible_editing": foren.possible_editing if foren else False,
+                "manipulation_score": foren.manipulation_score if foren else 0.0,
+                "details": foren.details if foren else {}
+            } if foren else None,
+            "duplicate": {
+                "similarity_score": dup.similarity_score if dup else 0.0,
+                "matched_evidence_id": dup.matched_evidence_id if dup else None,
+                "algorithm": dup.algorithm if dup else "NONE"
+            } if dup else None
         })
 
     logs_list = []
@@ -128,13 +157,14 @@ def get_claim(claim_id: str, db: Session = Depends(get_db)):
         "recommendation": claim.recommendation,
         "source_type": claim.source_type,
         "created_at": claim.created_at.isoformat() if claim.created_at else None,
+        "explanation": risk_detail.explanation if risk_detail else None,
         "evidence": evidence_list,
         "audit_logs": logs_list
     }
 
 
 # =========================================================================
-# CREATE CLAIM (Real Upload, Camera, or Demo)
+# CREATE CLAIM (Real Upload, Camera, or Demo with Real Verification Pipeline)
 # =========================================================================
 @router.post("/")
 def create_claim(
@@ -150,11 +180,99 @@ def create_claim(
     db: Session = Depends(get_db)
 ):
     next_claim_num = f"CLM-{uuid.uuid4().hex[:6].upper()}"
+    ev_id = f"EV-{uuid.uuid4().hex[:6].upper()}"
 
-    # Calculate realistic automated risk score based on claim criteria
-    calculated_risk = 87.0 if amount > 1000 else 42.0
-    risk_level = "HIGH" if calculated_risk > 80 else ("MEDIUM" if calculated_risk > 50 else "LOW")
+    saved_filename = "evidence.jpg"
+    file_size = 0
+    file_bytes: Optional[bytes] = None
+    width, height = 1280, 960
+    dest_path = ""
 
+    # 1. Evidence Input Handling & File Validation
+    if file and file.filename:
+        saved_filename = file.filename
+        content = file.file.read()
+        file_bytes = content
+        file_size = len(content)
+
+        # File validation
+        content_type = file.content_type or "image/jpeg"
+        if not content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="Invalid file type. Only image files are accepted.")
+
+        if file_size > 15 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="File too large. Maximum allowed size is 15MB.")
+
+        dest_path = os.path.join(UPLOAD_DIR, f"{ev_id}_{saved_filename}")
+        with open(dest_path, "wb") as f:
+            f.write(content)
+
+        file_hash = hashlib.sha256(content).hexdigest()
+
+        try:
+            with PILImage.open(dest_path) as img:
+                width, height = img.size
+        except Exception:
+            pass
+
+    elif source_type == "demo" and demo_filename:
+        saved_filename = demo_filename
+        # Check if demo file exists locally
+        demo_candidate = os.path.join(DEMO_DIR, demo_filename)
+        if os.path.exists(demo_candidate):
+            dest_path = demo_candidate
+            with open(demo_candidate, "rb") as f:
+                content = f.read()
+                file_bytes = content
+                file_size = len(content)
+                file_hash = hashlib.sha256(content).hexdigest()
+            try:
+                with PILImage.open(dest_path) as img:
+                    width, height = img.size
+            except Exception:
+                pass
+        else:
+            file_hash = hashlib.sha256(f"demo-{demo_filename}".encode()).hexdigest()
+            file_size = 2100000
+    else:
+        file_hash = hashlib.sha256(f"claim-{next_claim_num}".encode()).hexdigest()
+        file_size = 1500000
+
+    # 2. RUN REAL VERIFICATION ENGINES
+    # Layer A: Image Forensics (EXIF & manipulation)
+    forensic_res = analyze_image_forensics(dest_path, source_type=source_type)
+
+    # Layer B: Duplicate Evidence Detection (SHA-256 and dHash)
+    duplicate_res = analyze_duplicate_evidence(db, ev_id, file_hash, image_path=dest_path)
+
+    # Layer C: Provenance & Synthetic Media Inspection
+    provenance_res = analyze_provenance(dest_path, raw_bytes=file_bytes)
+
+    # Layer D: Order Verification
+    matched_order = db.query(Order).filter(Order.id == order_id).first()
+    order_exists = matched_order is not None
+    order_amount_matches = (matched_order.amount >= amount) if matched_order else False
+
+    # Layer E: Customer Behaviour Analytics
+    behaviour_res = analyze_customer_behaviour(db, customer_id, claim_amount=amount)
+
+    # Layer F: Evidence-Fusion Risk Engine
+    risk_evaluation = calculate_evidence_risk(
+        provenance=provenance_res,
+        forensics=forensic_res,
+        duplicate=duplicate_res,
+        behaviour=behaviour_res,
+        order_exists=order_exists,
+        order_amount_matches=order_amount_matches,
+        claim_amount=amount
+    )
+
+    final_risk_score = risk_evaluation["score"]
+    final_risk_level = risk_evaluation["level"]
+    final_recommendation = risk_evaluation["recommendation"]
+    final_status = "UNDER_REVIEW" if final_risk_score >= 60.0 else "PROCESSING"
+
+    # 3. SAVE TO DATABASE
     new_claim = Claim(
         id=next_claim_num,
         claim_number=next_claim_num,
@@ -165,58 +283,24 @@ def create_claim(
         description=description,
         amount=amount,
         currency=currency,
-        status="UNDER_REVIEW" if calculated_risk > 70 else "PROCESSING",
-        risk_score=calculated_risk,
-        risk_level=risk_level,
-        recommendation="MANUAL_REVIEW" if calculated_risk > 70 else "APPROVE_REFUND",
+        status=final_status,
+        risk_score=final_risk_score,
+        risk_level=final_risk_level,
+        recommendation=final_recommendation,
         source_type=source_type,
         created_at=datetime.utcnow()
     )
     db.add(new_claim)
     db.commit()
 
-    # Evidence Handling
-    ev_id = f"EV-{uuid.uuid4().hex[:6].upper()}"
-    saved_filename = "evidence.jpg"
-    file_size = 2400000
-    file_hash = hashlib.sha256(f"{next_claim_num}-{datetime.utcnow()}".encode()).hexdigest()
-    width, height = 1280, 960
-
-    if file and file.filename:
-        # REAL FILE UPLOAD OR CAMERA CAPTURE
-        saved_filename = file.filename
-        content = file.file.read()
-        file_size = len(content)
-        file_hash = hashlib.sha256(content).hexdigest()
-
-        # Validate MIME
-        content_type = file.content_type or "image/jpeg"
-        if not content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
-
-        # Save to local uploads
-        dest_path = os.path.join(UPLOAD_DIR, f"{ev_id}_{saved_filename}")
-        with open(dest_path, "wb") as f:
-            f.write(content)
-
-        try:
-            with PILImage.open(dest_path) as img:
-                width, height = img.size
-        except Exception:
-            pass
-
-    elif source_type == "demo" and demo_filename:
-        # DEMO SCENARIO EVIDENCE
-        saved_filename = demo_filename
-        file_hash = hashlib.sha256(f"demo-{demo_filename}".encode()).hexdigest()
-
+    # Evidence Record
     new_evidence = ClaimEvidence(
         id=ev_id,
         claim_id=new_claim.id,
         file_name=saved_filename,
         file_type="image/jpeg",
         file_size=file_size,
-        storage_path=f"/damage.jpg",
+        storage_path=f"/demo-evidence/{saved_filename}" if source_type == "demo" else (f"/uploads/{ev_id}_{saved_filename}" if dest_path else "/damage.jpg"),
         sha256=file_hash,
         source_type=source_type,
         width=width,
@@ -225,14 +309,86 @@ def create_claim(
     )
     db.add(new_evidence)
 
-    # Log to audit trail
-    log = AuditLog(
-        claim_id=new_claim.id,
-        action="claim.created",
-        details={"source_type": source_type, "file": saved_filename, "risk_score": calculated_risk},
+    # Forensic Result
+    f_record = ForensicResult(
+        evidence_id=ev_id,
+        metadata_anomaly=forensic_res["metadata_anomaly"],
+        possible_editing=forensic_res["possible_editing"],
+        compression_anomaly=forensic_res["compression_anomaly"],
+        clone_region=forensic_res["clone_region"],
+        resampling_indicator=forensic_res["resampling_indicator"],
+        quality_score=forensic_res["quality_score"],
+        manipulation_score=forensic_res["manipulation_score"],
+        details=forensic_res["details"],
         created_at=datetime.utcnow()
     )
-    db.add(log)
+    db.add(f_record)
+
+    # Duplicate Result
+    d_record = DuplicateResult(
+        evidence_id=ev_id,
+        matched_evidence_id=duplicate_res.get("matched_evidence_id"),
+        similarity_score=duplicate_res.get("similarity_score", 0.0),
+        algorithm=duplicate_res.get("algorithm", "SHA256_DHASH"),
+        created_at=datetime.utcnow()
+    )
+    db.add(d_record)
+
+    # Provenance Result
+    p_record = ProvenanceResult(
+        evidence_id=ev_id,
+        c2pa_outcome=provenance_res["c2pa_outcome"],
+        c2pa_validation_state=provenance_res["c2pa_validation_state"],
+        c2pa_issuer=provenance_res.get("c2pa_issuer"),
+        c2pa_model=provenance_res.get("c2pa_model"),
+        synthid_outcome=provenance_res["synthid_outcome"],
+        source=provenance_res["source"],
+        raw_result=provenance_res["raw_result"],
+        created_at=datetime.utcnow()
+    )
+    db.add(p_record)
+
+    # Risk Score Result
+    r_record = RiskScore(
+        claim_id=new_claim.id,
+        provenance_score=float(provenance_res.get("signal_score", 0)),
+        synthid_score=0.0,
+        forensic_score=float(forensic_res.get("signal_score", 0)),
+        duplicate_score=float(duplicate_res.get("signal_score", 0)),
+        order_match_score=0.0 if order_exists else 25.0,
+        behaviour_score=float(behaviour_res.get("signal_score", 0)),
+        total_score=final_risk_score,
+        risk_level=final_risk_level,
+        recommendation=final_recommendation,
+        explanation=risk_evaluation["explanation"],
+        created_at=datetime.utcnow()
+    )
+    db.add(r_record)
+
+    # Audit Logs
+    db.add(AuditLog(
+        claim_id=new_claim.id,
+        action="claim.created",
+        details={"source_type": source_type, "file": saved_filename, "amount": amount},
+        created_at=datetime.utcnow()
+    ))
+    db.add(AuditLog(
+        claim_id=new_claim.id,
+        action="evidence.analyzed",
+        details={
+            "sha256": file_hash[:16] + "...",
+            "duplicate": duplicate_res["is_duplicate"],
+            "editing_flag": forensic_res["possible_editing"]
+        },
+        created_at=datetime.utcnow()
+    ))
+    db.add(AuditLog(
+        claim_id=new_claim.id,
+        action="risk.evaluated",
+        details={"score": final_risk_score, "level": final_risk_level, "signals": len(risk_evaluation["signals"])},
+        created_at=datetime.utcnow()
+    ))
+
     db.commit()
 
     return {
@@ -241,14 +397,17 @@ def create_claim(
         "status": new_claim.status,
         "risk_score": new_claim.risk_score,
         "risk_level": new_claim.risk_level,
+        "recommendation": new_claim.recommendation,
         "source_type": new_claim.source_type,
         "evidence_id": ev_id,
-        "message": "Claim created successfully. Starting evidence verification..."
+        "signals": risk_evaluation["signals"],
+        "explanation": risk_evaluation["explanation"],
+        "message": f"Claim verified via 5-signal pipeline. Risk: {final_risk_level} ({final_risk_score}/100)"
     }
 
 
 # =========================================================================
-# REVIEW DECISION
+# REVIEW DECISION (Approve, Partial, Request Evidence, Escalate, Reject)
 # =========================================================================
 @router.post("/{claim_id}/review")
 def review_claim(
@@ -275,7 +434,7 @@ def review_claim(
     log = AuditLog(
         claim_id=claim.id,
         action=f"review.{decision.lower()}",
-        details={"decision": decision, "notes": notes[:50]},
+        details={"decision": decision, "notes": notes[:80]},
         created_at=datetime.utcnow()
     )
     db.add(log)
@@ -296,15 +455,14 @@ def reset_demo_data(db: Session = Depends(get_db)):
         count = len(demo_claims)
 
         for c in demo_claims:
-            # Delete associated evidence and logs
             db.query(ClaimEvidence).filter(ClaimEvidence.claim_id == c.id).delete()
             db.query(ReviewAction).filter(ReviewAction.claim_id == c.id).delete()
             db.query(AuditLog).filter(AuditLog.claim_id == c.id).delete()
+            db.query(RiskScore).filter(RiskScore.claim_id == c.id).delete()
             db.delete(c)
 
         db.commit()
 
-        # Log system audit action
         sys_log = AuditLog(
             claim_id="SYSTEM",
             action="demo.reset_completed",

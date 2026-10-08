@@ -76,7 +76,7 @@ export default function ReviewQueuePage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 border-2 border-[#111] rounded-[10px] font-bold text-[13px] transition-transform ${
+            className={`px-4 py-2 min-h-[44px] border-2 border-[#111] rounded-[10px] font-bold text-[13px] whitespace-nowrap transition-transform ${
               activeTab === tab
                 ? "bg-[#ff3d81] text-[#111] neo-shadow-sm hover-neo-sm"
                 : "bg-white text-[#111] hover:bg-[#fdf9f0]"
@@ -88,7 +88,7 @@ export default function ReviewQueuePage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md overflow-x-auto">
+      <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-3 sm:p-6 neo-shadow-md w-full overflow-x-auto">
         {reviewClaims.length === 0 ? (
           <div className="py-16 text-center">
             <div className="w-12 h-12 rounded-full bg-[#3ddc97] border-2 border-[#111] flex items-center justify-center mx-auto mb-3">
@@ -149,7 +149,7 @@ export default function ReviewQueuePage() {
                         setSelectedClaim(claim);
                         setReason(claim.reviewReason ? `Action determined based on: ${claim.reviewReason}` : "Evidence does not sufficiently support claim.");
                       }}
-                      className="px-3.5 py-1.5 bg-[#ffd23f] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+                      className="px-3.5 py-1.5 min-h-[38px] bg-[#ffd23f] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
                     >
                       Review
                     </button>
@@ -163,16 +163,16 @@ export default function ReviewQueuePage() {
 
       {/* Review Screen Modal */}
       {selectedClaim && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-white border-2 border-[#111] rounded-[20px] neo-shadow-lg flex flex-col max-h-[92vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-3xl bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col max-h-[90vh] overflow-hidden">
             
             {/* Modal Top */}
-            <div className="flex items-center justify-between p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
-              <div className="flex items-center space-x-3">
-                <span className="font-display text-[20px] text-[#111] uppercase">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
+              <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap pr-2">
+                <span className="font-display text-[16px] sm:text-[20px] text-[#111] uppercase">
                   Claim Review • {selectedClaim.id}
                 </span>
-                <span className={`px-2 py-0.5 rounded-full border border-[#111] font-mono text-[11px] font-bold ${
+                <span className={`px-2 py-0.5 rounded-full border border-[#111] font-mono text-[10px] sm:text-[11px] font-bold ${
                   selectedClaim.riskLevel === 'CRITICAL' ? 'bg-[#c8a2ff]' : 'bg-[#ff3d81]'
                 }`}>
                   {selectedClaim.riskLevel} RISK ({selectedClaim.riskScore})
@@ -180,7 +180,8 @@ export default function ReviewQueuePage() {
               </div>
               <button 
                 onClick={() => setSelectedClaim(null)}
-                className="w-8 h-8 flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm hover-neo-sm transition-transform"
+                className="w-10 h-10 min-w-[40px] flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm hover-neo-sm transition-transform shrink-0"
+                aria-label="Close Review Modal"
               >
                 <X className="w-5 h-5 text-[#111]" strokeWidth={3} />
               </button>
@@ -256,7 +257,7 @@ export default function ReviewQueuePage() {
               {/* Review Decision Buttons */}
               <div className="space-y-2">
                 <label className="font-bold text-[13px] uppercase tracking-wide block">Review Decision</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                   {[
                     { label: "Approve Refund", value: "Approved", bg: "bg-[#3ddc97]" },
                     { label: "Partial Refund", value: "Approved", bg: "bg-[#ffd23f]" },
@@ -268,7 +269,7 @@ export default function ReviewQueuePage() {
                       key={i}
                       type="button"
                       onClick={() => setDecision(btn.value as any)}
-                      className={`p-3 border-2 border-[#111] rounded-[10px] font-bold text-[12px] text-center transition-all ${
+                      className={`p-3 min-h-[44px] border-2 border-[#111] rounded-[10px] font-bold text-[12px] text-center transition-all ${
                         decision === btn.value ? `${btn.bg} neo-shadow-sm` : "bg-white hover:bg-[#fdf9f0]"
                       }`}
                     >
@@ -294,17 +295,17 @@ export default function ReviewQueuePage() {
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t-2 border-[#111]">
+              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:space-x-3 pt-3 border-t-2 border-[#111] items-stretch sm:items-center justify-end">
                 <button
                   type="button"
                   onClick={() => setSelectedClaim(null)}
-                  className="px-4 py-2 bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
+                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+                  className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
                 >
                   Confirm Decision
                 </button>

@@ -6,10 +6,8 @@ import {
   Camera, 
   Sparkles, 
   X, 
-  RefreshCw, 
   Check, 
   AlertTriangle, 
-  FileCheck,
   RotateCcw
 } from "lucide-react";
 
@@ -182,7 +180,7 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
         videoRef.current.srcObject = stream;
       }
       setIsCameraActive(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.warn("Camera access failed:", err);
       setCameraError("Camera access is unavailable. You can upload an image instead.");
     }
@@ -394,10 +392,10 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
 
       {/* CAMERA CAPTURE MODAL / PREVIEW */}
       {mode === "camera" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111]/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-lg bg-white border-2 border-[#111] rounded-[20px] neo-shadow-lg p-5 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/60 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-lg bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg p-4 sm:p-5 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b-2 border-[#111] pb-2">
-              <h3 className="font-display text-[18px] uppercase flex items-center">
+              <h3 className="font-display text-[16px] sm:text-[18px] uppercase flex items-center">
                 <Camera className="w-5 h-5 mr-2 text-[#ffd23f]" strokeWidth={2.5} />
                 Live Camera Capture
               </h3>
@@ -407,17 +405,18 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
                   stopCamera();
                   setMode("none");
                 }}
-                className="w-7 h-7 flex items-center justify-center bg-[#ff3d81] border border-[#111] rounded text-white"
+                className="w-9 h-9 min-w-[36px] flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] text-white"
+                aria-label="Close Camera"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 text-[#111]" strokeWidth={2.5} />
               </button>
             </div>
 
             {cameraError ? (
               <div className="p-4 bg-amber-50 border-2 border-amber-600 rounded-[12px] space-y-3 text-[13px]">
                 <div className="flex items-center text-amber-800 font-bold">
-                  <AlertTriangle className="w-5 h-5 mr-2 text-amber-600" />
-                  {cameraError}
+                  <AlertTriangle className="w-5 h-5 mr-2 text-amber-600 shrink-0" />
+                  <span>{cameraError}</span>
                 </div>
                 <button
                   type="button"
@@ -426,7 +425,7 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
                     setMode("upload");
                     fileInputRef.current?.click();
                   }}
-                  className="px-4 py-2 bg-[#3ddc97] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
+                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
                 >
                   <Upload className="w-4 h-4 inline mr-1" /> Upload Image Instead
                 </button>
@@ -450,7 +449,7 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
                   <button
                     type="button"
                     onClick={capturePhoto}
-                    className="px-6 py-2.5 bg-[#ffd23f] border-2 border-[#111] rounded-[12px] neo-shadow-sm font-bold text-[13px] hover-neo-sm transition-transform flex items-center"
+                    className="w-full sm:w-auto px-6 py-3 min-h-[44px] bg-[#ffd23f] border-2 border-[#111] rounded-[12px] neo-shadow-sm font-bold text-[13px] hover-neo-sm transition-transform flex items-center justify-center"
                   >
                     <Camera className="w-4 h-4 mr-2" /> Take Snapshot
                   </button>
@@ -465,21 +464,21 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
                   </div>
                 </div>
 
-                <div className="flex justify-end space-x-3">
+                <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-3">
                   <button
                     type="button"
                     onClick={() => {
                       setCapturedSnapshot(null);
                       startCamera();
                     }}
-                    className="px-4 py-2 bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px] flex items-center"
+                    className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px] flex items-center justify-center"
                   >
                     <RotateCcw className="w-4 h-4 mr-1.5" /> Retake
                   </button>
                   <button
                     type="button"
                     onClick={confirmCapturedPhoto}
-                    className="px-5 py-2 bg-[#3ddc97] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] flex items-center"
+                    className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] flex items-center justify-center"
                   >
                     <Check className="w-4 h-4 mr-1.5" /> Use Photo
                   </button>
@@ -492,29 +491,30 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
 
       {/* DEMO EVIDENCE PICKER MODAL */}
       {mode === "demo" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111]/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-2xl bg-white border-2 border-[#111] rounded-[20px] neo-shadow-lg p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/60 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-2xl bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg p-4 sm:p-5 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b-2 border-[#111] pb-2">
-              <div>
-                <h3 className="font-display text-[18px] uppercase flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2 text-[#c8a2ff]" strokeWidth={2.5} />
+              <div className="pr-2">
+                <h3 className="font-display text-[16px] sm:text-[18px] uppercase flex items-center">
+                  <Sparkles className="w-5 h-5 mr-2 text-[#c8a2ff] shrink-0" strokeWidth={2.5} />
                   Select Demo Scenario Evidence
                 </h3>
-                <p className="text-[12px] text-[#111]/70 font-medium">
+                <p className="text-[11px] sm:text-[12px] text-[#111]/70 font-medium">
                   Test the TrustLens verification pipeline using distinct categorized demo evidence.
                 </p>
               </div>
               <button 
                 type="button"
                 onClick={() => setMode("none")}
-                className="w-7 h-7 flex items-center justify-center bg-[#ff3d81] border border-[#111] rounded text-white"
+                className="w-9 h-9 min-w-[36px] flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] text-white shrink-0"
+                aria-label="Close Demo Picker"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 text-[#111]" strokeWidth={2.5} />
               </button>
             </div>
 
             {/* Scenario Categories */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
               {DEMO_SCENARIOS.map((sc) => (
                 <button
                   key={sc.id}
@@ -523,7 +523,7 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
                     setSelectedScenarioId(sc.id);
                     setSelectedDemoImage(sc.images[0].id);
                   }}
-                  className={`p-2.5 border-2 border-[#111] rounded-[10px] text-left transition-transform ${
+                  className={`p-2.5 min-h-[44px] border-2 border-[#111] rounded-[10px] text-left transition-transform ${
                     selectedScenarioId === sc.id
                       ? "bg-[#c8a2ff] neo-shadow-sm font-bold"
                       : "bg-[#fdf9f0] hover:bg-white"
@@ -577,18 +577,18 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
               );
             })()}
 
-            <div className="flex justify-end space-x-3 pt-3 border-t-2 border-[#111]">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:space-x-3 pt-3 border-t-2 border-[#111]">
               <button
                 type="button"
                 onClick={() => setMode("none")}
-                className="px-4 py-2 bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
+                className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={confirmDemoEvidence}
-                className="px-5 py-2 bg-[#c8a2ff] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+                className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#c8a2ff] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
               >
                 Use This Demo Evidence
               </button>

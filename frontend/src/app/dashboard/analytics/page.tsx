@@ -53,42 +53,42 @@ export default function RiskAnalyticsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
         <div>
-          <h1 className="font-display text-[28px] text-[#111] uppercase tracking-tight flex items-center">
-            <ShieldAlert className="w-7 h-7 mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
+          <h1 className="font-display text-[24px] sm:text-[28px] text-[#111] uppercase tracking-tight flex items-center">
+            <ShieldAlert className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
             Risk Analytics &amp; Intelligence
           </h1>
-          <p className="text-[14px] text-[#111]/70 font-medium">
+          <p className="text-[13px] sm:text-[14px] text-[#111]/70 font-medium">
             Deep forensic risk trends, multimodal signal distribution, and automated fraud prevention metrics.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2 sm:space-x-3 w-full sm:w-auto">
           {/* Time range selector */}
           <div className="relative">
             <button 
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="flex items-center px-3.5 py-2 bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-semibold text-[13px] hover-neo-sm transition-transform"
+              className="flex items-center px-3.5 py-2 min-h-[44px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-semibold text-[13px] hover-neo-sm transition-transform"
             >
               {timeRange === "7d" ? "Last 7 days" : timeRange === "30d" ? "Last 30 days" : "Last 90 days"}
               <ChevronDown className="w-4 h-4 ml-2" strokeWidth={2.5} />
             </button>
             {isTimeDropdownOpen && (
-              <div className="absolute right-0 mt-1 w-40 bg-white border-2 border-[#111] rounded-[10px] neo-shadow-md z-30 py-1 font-bold text-[12px]">
+              <div className="absolute right-0 mt-1 w-40 max-w-[calc(100vw-32px)] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-md z-30 py-1 font-bold text-[12px]">
                 <button 
                   onClick={() => { setTimeRange("7d"); setIsTimeDropdownOpen(false); }}
-                  className="w-full text-left px-3 py-1.5 hover:bg-[#fdf9f0]"
+                  className="w-full text-left px-3 py-2 min-h-[36px] hover:bg-[#fdf9f0]"
                 >
                   Last 7 days
                 </button>
                 <button 
                   onClick={() => { setTimeRange("30d"); setIsTimeDropdownOpen(false); }}
-                  className="w-full text-left px-3 py-1.5 hover:bg-[#fdf9f0]"
+                  className="w-full text-left px-3 py-2 min-h-[36px] hover:bg-[#fdf9f0]"
                 >
                   Last 30 days
                 </button>
                 <button 
                   onClick={() => { setTimeRange("90d"); setIsTimeDropdownOpen(false); }}
-                  className="w-full text-left px-3 py-1.5 hover:bg-[#fdf9f0]"
+                  className="w-full text-left px-3 py-2 min-h-[36px] hover:bg-[#fdf9f0]"
                 >
                   Last 90 days
                 </button>
@@ -100,8 +100,8 @@ export default function RiskAnalyticsPage() {
         </div>
       </div>
 
-      {/* Top 5 High-Impact Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+      {/* Top 5 High-Impact Metric Cards (1 col on small phones, 2 cols on medium, 5 on desktop) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-3.5">
         {[
           { label: "Average Risk", value: "41.2", sub: "/ 100 benchmark", color: "bg-[#ffd23f]", badge: "-4.8% trend" },
           { label: "High Risk Rate", value: "6.7%", sub: "86 claims flagged", color: "bg-[#ff3d81]", badge: "Needs triage" },
@@ -413,10 +413,10 @@ export default function RiskAnalyticsPage() {
       </div>
 
       {/* Forensic Detection Layers Performance Matrix (New Informative Table) */}
-      <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md space-y-4">
+      <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-3 sm:p-6 neo-shadow-md space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="font-bold text-[18px] text-[#111] flex items-center">
+            <h2 className="font-bold text-[16px] sm:text-[18px] text-[#111] flex items-center">
               <Cpu className="w-5 h-5 mr-2 text-[#3ddc97]" strokeWidth={2.5} />
               7-Layer Forensic Architecture Performance
             </h2>
@@ -424,13 +424,13 @@ export default function RiskAnalyticsPage() {
               Real-time benchmark and precision metrics across all multimodal verification models
             </p>
           </div>
-          <span className="font-mono text-[11px] font-bold px-2.5 py-1 bg-[#3ddc97] border border-[#111] rounded">
+          <span className="font-mono text-[11px] font-bold px-2.5 py-1 bg-[#3ddc97] border border-[#111] rounded self-start sm:self-auto">
             ALL ENGINES ONLINE
           </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full min-w-[650px] text-left border-collapse">
             <thead>
               <tr className="border-b-2 border-[#111] bg-[#fdf9f0]">
                 <th className="py-2.5 px-3 font-mono font-bold text-[11px] uppercase text-[#111]">Layer</th>
