@@ -19,6 +19,15 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+def init_db():
+    try:
+        from app.models import models
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print("init_db warning:", e)
+
+init_db()
+
 def get_db():
     db = SessionLocal()
     try:

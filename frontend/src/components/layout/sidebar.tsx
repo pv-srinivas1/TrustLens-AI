@@ -35,7 +35,11 @@ const navSections = [
   },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  onNavigate?: () => void;
+}
+
+export function Sidebar({ onNavigate }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -70,6 +74,7 @@ export function Sidebar() {
                   <Link
                     key={item.name}
                     href={item.href}
+                    onClick={onNavigate}
                     className="flex items-center px-3 py-2 bg-[#ff3d81] border-2 border-[#111] rounded-[10px] text-[#111] neo-shadow-sm font-bold text-[13px] transition-transform hover-neo-sm"
                   >
                     <item.icon className="w-4 h-4 mr-2.5 shrink-0" strokeWidth={2.5} />
@@ -82,6 +87,7 @@ export function Sidebar() {
                 <Link
                   key={item.name}
                   href={item.href}
+                  onClick={onNavigate}
                   className="flex items-center px-3 py-2 rounded-[10px] border-2 border-transparent text-[#111] font-semibold text-[13px] transition-all hover:bg-[#fdf9f0] hover:border-[#111] hover:neo-shadow-sm"
                 >
                   <item.icon className="w-4 h-4 mr-2.5 text-[#111]/70 shrink-0" strokeWidth={2.5} />

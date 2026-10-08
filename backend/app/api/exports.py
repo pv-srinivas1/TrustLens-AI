@@ -238,12 +238,15 @@ def export_risk_analytics_pdf(
     db: Session = Depends(get_db)
 ):
     try:
-        claims = db.query(Claim).all()
         avg_risk = 41.2
-        if claims:
-            valid_scores = [c.risk_score for c in claims if c.risk_score is not None]
-            if valid_scores:
-                avg_risk = round(sum(valid_scores) / len(valid_scores), 1)
+        try:
+            claims = db.query(Claim).all()
+            if claims:
+                valid_scores = [c.risk_score for c in claims if c.risk_score is not None]
+                if valid_scores:
+                    avg_risk = round(sum(valid_scores) / len(valid_scores), 1)
+        except Exception as db_err:
+            print("DB query warning in risk-analytics.pdf:", db_err)
 
         analytics_data = {
             "avg_risk": avg_risk,
