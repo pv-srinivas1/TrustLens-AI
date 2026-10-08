@@ -15,7 +15,10 @@ from app.models.models import (
 
 router = APIRouter()
 
-UPLOAD_DIR = os.path.abspath(os.path.join(os.getcwd(), "uploads"))
+if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+    UPLOAD_DIR = "/tmp/uploads"
+else:
+    UPLOAD_DIR = os.path.abspath(os.path.join(os.getcwd(), "uploads"))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # =========================================================================
