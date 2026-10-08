@@ -124,15 +124,15 @@ export function ExportMenu({
 
       setStatus("ready");
       setTimeout(() => setStatus("idle"), 2500);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.warn("Server export endpoint error, activating client fallback:", err);
       
       // Resilient client-side fallback generation
       try {
         const today = new Date().toISOString().split("T")[0];
         let content = "";
-        let mimeType = format === "csv" ? "text/csv;charset=utf-8;" : "application/pdf";
-        let fallbackName = `trustlens-${type}-${today}.${format}`;
+        const mimeType = format === "csv" ? "text/csv;charset=utf-8;" : "application/pdf";
+        const fallbackName = `trustlens-${type}-${today}.${format}`;
 
         if (format === "csv") {
           if (type === "risk_analytics") {
