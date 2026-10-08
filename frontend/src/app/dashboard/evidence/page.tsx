@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { 
   Layers, 
@@ -197,8 +196,19 @@ export default function EvidencePage() {
               return (
                 <tr key={ev.id} className="border-b-2 border-[#111]/10 hover:bg-[#fdf9f0] transition-colors">
                   <td className="py-3 px-3">
-                    <div className="relative w-12 h-10 bg-[#fdf9f0] border-2 border-[#111] rounded-[6px] overflow-hidden">
-                      <Image src={ev.imageSrc || "/damage.jpg"} alt={ev.filename} fill sizes="48px" className="object-cover" />
+                    <div className="relative w-12 h-10 bg-[#fdf9f0] border-2 border-[#111] rounded-[6px] overflow-hidden flex items-center justify-center">
+                      <img 
+                        src={ev.imageSrc || "/damage.jpg"} 
+                        alt={ev.filename} 
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (!target.src.includes("/damage.jpg")) {
+                            target.src = "/damage.jpg";
+                          }
+                        }}
+                      />
                       {isDemo && (
                         <div className="absolute top-0 right-0 bg-[#ffd23f] text-[#111] font-mono text-[8px] font-black px-1 border-l border-b border-[#111]">
                           DEMO
@@ -283,13 +293,17 @@ export default function EvidencePage() {
                 
                 {/* Image Section */}
                 <div className="md:col-span-7">
-                  <div className="relative aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[14px] overflow-hidden neo-shadow-sm">
-                    <Image 
+                  <div className="relative aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[14px] overflow-hidden neo-shadow-sm flex items-center justify-center">
+                    <img 
                       src={inspectedItem.imageSrc || "/damage.jpg"} 
                       alt={inspectedItem.filename} 
-                      fill 
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover" 
+                      className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (!target.src.includes("/damage.jpg")) {
+                          target.src = "/damage.jpg";
+                        }
+                      }}
                     />
                     <div className="absolute top-2 right-2 px-2.5 py-1 bg-[#111] text-white font-mono text-[10px] font-bold rounded">
                       ACTUAL IMAGE

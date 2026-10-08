@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { 
   CheckSquare, 
@@ -200,16 +199,24 @@ export default function ReviewQueuePage() {
                 {/* Evidence Image */}
                 <div className="space-y-1.5">
                   <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#111]/70">Evidence Preview</label>
-                  <div className="relative aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[12px] overflow-hidden neo-shadow-sm">
-                    <Image 
-                      src="/damage.jpg" 
+                  <div className="relative aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[12px] overflow-hidden neo-shadow-sm flex items-center justify-center">
+                    <img 
+                      src={
+                        selectedClaim.evidenceFile?.startsWith("/") 
+                          ? selectedClaim.evidenceFile 
+                          : `/demo-evidence/${selectedClaim.evidenceFile || "damaged-food-01.jpg"}`
+                      } 
                       alt="Review Evidence" 
-                      fill 
-                      sizes="(max-width: 768px) 100vw, 30vw"
-                      className="object-cover" 
+                      className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (!target.src.includes("/damage.jpg")) {
+                          target.src = "/damage.jpg";
+                        }
+                      }}
                     />
                     <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-[#111] text-white font-mono text-[10px] font-bold rounded">
-                      damage.jpg • 2.4 MB
+                      {selectedClaim.evidenceFile || "damage.jpg"} • {selectedClaim.evidenceSize || "2.4 MB"}
                     </div>
                   </div>
                 </div>

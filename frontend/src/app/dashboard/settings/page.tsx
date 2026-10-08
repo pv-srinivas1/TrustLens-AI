@@ -190,7 +190,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Settings Sub-Navigation Tabs */}
-      <div className="flex items-center space-x-1.5 overflow-x-auto border-b-2 border-[#111] pb-2">
+      <div className="flex items-center space-x-1.5 overflow-x-auto border-b-2 border-[#111] pb-2.5 pt-1 scrollbar-thin scrollbar-thumb-[#111]/20">
         {[
           { id: "General", label: "General", icon: Building2 },
           { id: "Organization", label: "Organization", icon: Building2 },
@@ -205,7 +205,7 @@ export default function SettingsPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center px-3.5 py-2 rounded-[10px] border-2 border-[#111] font-bold text-[12px] whitespace-nowrap transition-transform ${
+            className={`flex items-center px-3.5 py-2 rounded-[10px] border-2 border-[#111] font-bold text-[12px] whitespace-nowrap transition-transform shrink-0 ${
               activeTab === tab.id
                 ? "bg-[#ff3d81] text-[#111] neo-shadow-sm"
                 : "bg-white text-[#111] hover:bg-[#fdf9f0]"
@@ -219,17 +219,20 @@ export default function SettingsPage() {
 
       {/* TAB CONTENT: 1. General */}
       {activeTab === "General" && (
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md max-w-2xl space-y-5">
-          <h2 className="font-bold text-[18px] text-[#111]">General Configuration</h2>
+        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md max-w-4xl space-y-5">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-[18px] text-[#111]">General Configuration</h2>
+            <span className="text-[11px] font-mono text-[#111]/60 font-bold">ORGANIZATION SETTINGS</span>
+          </div>
           
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="font-bold text-[12px] uppercase tracking-wide">Organization Name</label>
               <input 
                 type="text" 
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
-                className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px]" 
+                className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white" 
               />
             </div>
 
@@ -248,7 +251,7 @@ export default function SettingsPage() {
               <select 
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px]"
+                className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
               >
                 <option value="Asia/Kolkata (IST +05:30)">Asia/Kolkata (IST +05:30)</option>
                 <option value="America/New_York (EST -05:00)">America/New_York (EST -05:00)</option>
@@ -262,7 +265,7 @@ export default function SettingsPage() {
               <select 
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px]"
+                className="w-full p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
               >
                 <option value="INR (₹)">INR (₹)</option>
                 <option value="USD ($)">USD ($)</option>
@@ -272,7 +275,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="pt-3 border-t-2 border-[#111] flex items-center justify-between flex-wrap gap-3">
+          <div className="pt-2 border-t-2 border-[#111]/10 flex items-center justify-between flex-wrap gap-3">
             <button
               onClick={() => triggerSaveNotice("General settings saved successfully.")}
               className="px-5 py-2.5 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"

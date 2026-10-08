@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { 
   Grid,
@@ -44,15 +43,12 @@ export function Sidebar() {
       {/* Brand Header */}
       <div className="pt-6 pb-4 px-4 flex flex-col items-center justify-center border-b-2 border-[#111]/10">
         <Link href="/dashboard" className="flex flex-col items-center text-center group">
-          <Image 
+          <img 
             src="/logo.png" 
             alt="TrustLens AI" 
-            width={64} 
-            height={64} 
-            className="object-contain transition-transform group-hover:scale-105"
-            priority
+            className="w-14 h-14 object-contain transition-transform group-hover:scale-105"
           />
-          <h1 className="font-display text-[17px] text-[#111] tracking-tight mt-2.5">
+          <h1 className="font-display text-[17px] text-[#111] tracking-tight mt-2">
             TRUSTLENS AI
           </h1>
         </Link>

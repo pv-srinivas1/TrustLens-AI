@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import { 
   Upload, 
   Camera, 
@@ -368,13 +367,17 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="relative w-36 h-28 bg-white border-2 border-[#111] rounded-[10px] overflow-hidden shrink-0 neo-shadow-sm">
-              <Image 
-                src={currentEvidence.previewUrl} 
+            <div className="relative w-36 h-28 bg-white border-2 border-[#111] rounded-[10px] overflow-hidden shrink-0 neo-shadow-sm flex items-center justify-center">
+              <img 
+                src={currentEvidence.previewUrl || "/damage.jpg"} 
                 alt={currentEvidence.filename} 
-                fill 
-                sizes="150px" 
-                className="object-cover" 
+                className="w-full h-full object-cover" 
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (!target.src.includes("/damage.jpg")) {
+                    target.src = "/damage.jpg";
+                  }
+                }}
               />
             </div>
             <div className="space-y-1 text-[12px]">
@@ -549,13 +552,17 @@ export function EvidencePicker({ claimType, onEvidenceSelected }: EvidencePicker
                           selectedDemoImage === img.id ? "bg-[#ffd23f]/30 border-[#111] neo-shadow-sm" : "bg-white hover:bg-[#fdf9f0]"
                         }`}
                       >
-                        <div className="relative aspect-[4/3] bg-gray-100 rounded-[8px] overflow-hidden border border-[#111] mb-2">
-                          <Image 
+                        <div className="relative aspect-[4/3] bg-gray-100 rounded-[8px] overflow-hidden border border-[#111] mb-2 flex items-center justify-center">
+                          <img 
                             src={`/demo-evidence/${img.id}`} 
                             alt={img.title} 
-                            fill 
-                            sizes="250px" 
-                            className="object-cover" 
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              if (!target.src.includes("/damage.jpg")) {
+                                target.src = "/damage.jpg";
+                              }
+                            }}
                           />
                           <div className="absolute top-1.5 left-1.5 px-2 py-0.5 bg-[#111] text-white text-[9px] font-mono font-bold rounded">
                             DEMO

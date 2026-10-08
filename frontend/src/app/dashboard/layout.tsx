@@ -36,7 +36,7 @@ export default function DashboardLayout({
         
         <div className="flex-1 flex flex-col min-w-0">
           {/* Topbar */}
-          <header className="h-[68px] border-b-2 border-[#111]/10 bg-white/70 backdrop-blur-sm flex items-center justify-between px-8 shrink-0">
+          <header className="h-[68px] border-b-2 border-[#111]/10 bg-white/70 backdrop-blur-sm flex items-center justify-between px-4 sm:px-6 md:px-8 shrink-0">
             <div className="flex items-center space-x-3">
               <span className="inline-flex items-center px-2.5 py-1 bg-[#3ddc97] border-2 border-[#111] rounded-full text-[11px] font-bold text-[#111] neo-shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-[#111] mr-1.5 animate-pulse" />
@@ -54,7 +54,7 @@ export default function DashboardLayout({
                 <input 
                   type="text" 
                   placeholder="Quick search claims, IDs..." 
-                  className="w-[200px] md:w-[260px] pl-8 pr-3 py-1.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[12px] font-medium text-[#111] placeholder:text-[#111]/50 focus:outline-none focus:bg-white neo-shadow-sm transition-transform"
+                  className="w-[180px] sm:w-[220px] md:w-[260px] pl-8 pr-3 py-1.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[12px] font-medium text-[#111] placeholder:text-[#111]/50 focus:outline-none focus:bg-white neo-shadow-sm transition-transform"
                 />
               </div>
 
@@ -72,7 +72,7 @@ export default function DashboardLayout({
           </header>
           
           {/* Main Content Area */}
-          <main className="flex-1 overflow-y-auto px-8 pb-10 pt-2">
+          <main className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-8 pb-10 pt-2">
             <div className="max-w-[1400px] mx-auto">
               {children}
             </div>

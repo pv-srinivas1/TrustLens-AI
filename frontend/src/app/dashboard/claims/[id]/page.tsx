@@ -2,7 +2,6 @@
 
 import { useState, Suspense } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { 
   ArrowLeft, 
@@ -167,13 +166,17 @@ function ClaimDetailContent() {
             </div>
 
             {/* Actual Uploaded Image */}
-            <div className="relative w-full aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[12px] overflow-hidden neo-shadow-sm group">
-              <Image 
+            <div className="relative w-full aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[12px] overflow-hidden neo-shadow-sm group flex items-center justify-center">
+              <img 
                 src={imageSrc} 
                 alt="Uploaded Evidence" 
-                fill 
-                sizes="(max-width: 768px) 100vw, 40vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (!target.src.includes("/damage.jpg")) {
+                    target.src = "/damage.jpg";
+                  }
+                }}
               />
               <div className="absolute top-2 right-2 px-2 py-0.5 bg-[#111] text-white font-mono text-[10px] font-bold rounded">
                 JPG • 1280×960
