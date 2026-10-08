@@ -1,32 +1,48 @@
 def calculate_risk(prov: dict, forensic: dict, dup: dict, beh: dict) -> dict:
-    # Dummy risk logic summing up signal scores
-    total_score = prov.get("signal_score", 0) + forensic.get("signal_score", 0) + dup.get("signal_score", 0) + beh.get("signal_score", 0)
-    # Add a base risk or just cap at 100
-    total_score = min(total_score + 12, 100) # +12 just for base inconsistencies
-    
-    level = "LOW"
-    recommendation = "PROCESS ACCORDING TO PLATFORM POLICY"
-    
-    if total_score > 80:
-        level = "CRITICAL"
-        recommendation = "TRUST & SAFETY ESCALATION"
-    elif total_score > 60:
-        level = "HIGH"
-        recommendation = "HUMAN REVIEW"
-    elif total_score > 30:
-        level = "MEDIUM"
-        recommendation = "REQUEST ADDITIONAL EVIDENCE"
-
+    # Evidence-Fusion Weighting System
+    score = 0
     signals = []
-    if prov.get("c2pa_detected"):
-        signals.append("Provenance signal detected")
-    if forensic.get("possible_editing"):
-        signals.append("Image manipulation indicators")
-    if dup.get("similarity_score", 0) > 90:
-        signals.append("Similar evidence detected")
-    if beh.get("anomaly_score", 0) > 80:
-        signals.append("Claim frequency anomaly")
+    
+    # 1. Provenance (C2PA)
+    if prov.get("c2pa_detected") and prov.get("c2pa_issuer") != "Unknown":
+        score += 25
+        signals.append({"name": "C2PA provenance detected", "weight": "+25"})
         
+    # 2. Provenance (SynthID)
+    if prov.get("synthid_detected"):
+        score += 30
+        signals.append({"name": "SynthID watermark detected", "weight": "+30"})
+        
+    # 3. Forensics (Manipulation/Metadata)
+    if forensic.get("possible_editing"):
+        score += 20
+        signals.append({"name": "Manipulation indicators detected", "weight": "+20"})
+        
+    # 4. Evidence Comparison (Duplicates)
+    sim_score = dup.get("similarity_score", 0)
+    if sim_score > 90:
+        score += 15
+        signals.append({"name": f"Similar evidence found ({sim_score}% match)", "weight": "+15"})
+        
+    # 5. Behaviour (Claim history)
+    if beh.get("anomaly_score", 0) > 80:
+        score += 10
+        signals.append({"name": "Suspicious claim history", "weight": "+10"})
+        
+    # Cap score at 100
+    total_score = min(score, 100)
+    
+    # Final TrustLens result determination
+    level = "LOW RISK"
+    recommendation = "APPROVE REFUND"
+    
+    if total_score >= 80:
+        level = "HIGH VERIFICATION RISK"
+        recommendation = "Human Review Recommended"
+    elif total_score >= 40:
+        level = "MEDIUM VERIFICATION RISK"
+        recommendation = "Request Additional Evidence"
+
     return {
         "score": total_score,
         "level": level,

@@ -1,4 +1,7 @@
+import { Suspense } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
+import { TrustLensProvider } from "@/lib/store";
+import { Search, ShieldCheck } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -6,13 +9,76 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen w-full bg-white text-slate-900 font-sans">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto border-l border-slate-100 p-6">
-        <div className="max-w-6xl">
-          {children}
+    <TrustLensProvider>
+      <style dangerouslySetInnerHTML={{__html: `
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+        
+        .font-display { font-family: 'Archivo Black', sans-serif; }
+        .font-body { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+        
+        .neo-shadow-sm { box-shadow: 3px 3px 0px #111111; }
+        .neo-shadow-md { box-shadow: 4px 4px 0px #111111; }
+        .neo-shadow-lg { box-shadow: 6px 6px 0px #111111; }
+        
+        .hover-neo-sm:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0px #111111; }
+        .hover-neo-md:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #111111; }
+        
+        .bg-grid {
+          background-image: linear-gradient(rgba(17,17,17,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(17,17,17,0.05) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+      `}} />
+      <div className="flex h-screen w-full bg-[#fdf9f0] bg-grid text-[#111] font-body overflow-hidden">
+        <Suspense fallback={<aside className="w-[240px] h-screen bg-white border-r-2 border-[#111] shrink-0" />}>
+          <Sidebar />
+        </Suspense>
+        
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Topbar */}
+          <header className="h-[68px] border-b-2 border-[#111]/10 bg-white/70 backdrop-blur-sm flex items-center justify-between px-8 shrink-0">
+            <div className="flex items-center space-x-3">
+              <span className="inline-flex items-center px-2.5 py-1 bg-[#3ddc97] border-2 border-[#111] rounded-full text-[11px] font-bold text-[#111] neo-shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-[#111] mr-1.5 animate-pulse" />
+                SYSTEM ONLINE
+              </span>
+              <span className="hidden sm:inline font-mono text-[11px] font-bold text-[#111]/60">
+                FASTAPI v2.4 • POSTGRESQL CONNECTED
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              {/* Search */}
+              <div className="relative flex items-center">
+                <Search className="absolute left-3 w-3.5 h-3.5 text-[#111]" strokeWidth={2.5} />
+                <input 
+                  type="text" 
+                  placeholder="Quick search claims, IDs..." 
+                  className="w-[200px] md:w-[260px] pl-8 pr-3 py-1.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[12px] font-medium text-[#111] placeholder:text-[#111]/50 focus:outline-none focus:bg-white neo-shadow-sm transition-transform"
+                />
+              </div>
+
+              {/* Engine Status badge */}
+              <div className="hidden md:flex items-center px-3 py-1.5 bg-[#ffd23f] border-2 border-[#111] rounded-[10px] neo-shadow-sm text-[11px] font-mono font-bold text-[#111]">
+                <ShieldCheck className="w-3.5 h-3.5 mr-1.5" strokeWidth={2.5} />
+                ENGINE: ACTIVE
+              </div>
+              
+              {/* Avatar */}
+              <div className="w-8 h-8 rounded-full bg-[#c8a2ff] border-2 border-[#111] flex items-center justify-center font-display text-[12px] text-[#111] neo-shadow-sm cursor-pointer hover-neo-sm transition-transform">
+                AR
+              </div>
+            </div>
+          </header>
+          
+          {/* Main Content Area */}
+          <main className="flex-1 overflow-y-auto px-8 pb-10 pt-2">
+            <div className="max-w-[1400px] mx-auto">
+              {children}
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </TrustLensProvider>
   );
 }

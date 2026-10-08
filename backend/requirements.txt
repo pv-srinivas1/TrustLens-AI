@@ -13,3 +13,5 @@ imagehash
 paddleocr
 supabase
 python-multipart
+reportlab
+pypdf
