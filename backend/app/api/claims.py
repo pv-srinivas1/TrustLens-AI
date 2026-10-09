@@ -17,6 +17,19 @@ from app.engines.duplicate.analyzer import analyze_duplicate_evidence
 from app.engines.provenance.analyzer import analyze_provenance
 from app.engines.behaviour.analyzer import analyze_customer_behaviour
 from app.engines.risk.analyzer import calculate_evidence_risk
+from app.engines.ocr.analyzer import analyze_ocr
+
+from supabase import create_client, Client
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase_client: Optional[Client] = None
+if SUPABASE_URL and SUPABASE_KEY:
+    supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 router = APIRouter()
 
@@ -238,41 +251,29 @@ def create_claim(
         file_hash = hashlib.sha256(f"claim-{next_claim_num}".encode()).hexdigest()
         file_size = 1500000
 
-    # 2. RUN REAL VERIFICATION ENGINES
-    # Layer A: Image Forensics (EXIF & manipulation)
-    forensic_res = analyze_image_forensics(dest_path, source_type=source_type)
+    # Upload to Supabase first so the worker can use the file or URL if needed
+    # Actually the worker can use the local dest_path, and we can also upload to Supabase here or in the worker.
+    # We will do it here so we have the storage path immediately.
 
-    # Layer B: Duplicate Evidence Detection (SHA-256 and dHash)
-    duplicate_res = analyze_duplicate_evidence(db, ev_id, file_hash, image_path=dest_path)
+    # Upload to Supabase
+    supabase_url = ""
+    if supabase_client and dest_path and source_type != "demo":
+        try:
+            with open(dest_path, "rb") as f:
+                upload_res = supabase_client.storage.from_("evidence").upload(
+                    path=f"{ev_id}_{saved_filename}",
+                    file=f,
+                    file_options={"content-type": content_type if file else "image/jpeg"}
+                )
+            # Get public URL
+            supabase_url = supabase_client.storage.from_("evidence").get_public_url(f"{ev_id}_{saved_filename}")
+        except Exception as e:
+            print("Supabase upload error:", e)
+            supabase_url = f"/uploads/{ev_id}_{saved_filename}"
+    else:
+        supabase_url = f"/demo-evidence/{saved_filename}" if source_type == "demo" else f"/uploads/{ev_id}_{saved_filename}"
 
-    # Layer C: Provenance & Synthetic Media Inspection
-    provenance_res = analyze_provenance(dest_path, raw_bytes=file_bytes)
-
-    # Layer D: Order Verification
-    matched_order = db.query(Order).filter(Order.id == order_id).first()
-    order_exists = matched_order is not None
-    order_amount_matches = (matched_order.amount >= amount) if matched_order else False
-
-    # Layer E: Customer Behaviour Analytics
-    behaviour_res = analyze_customer_behaviour(db, customer_id, claim_amount=amount)
-
-    # Layer F: Evidence-Fusion Risk Engine
-    risk_evaluation = calculate_evidence_risk(
-        provenance=provenance_res,
-        forensics=forensic_res,
-        duplicate=duplicate_res,
-        behaviour=behaviour_res,
-        order_exists=order_exists,
-        order_amount_matches=order_amount_matches,
-        claim_amount=amount
-    )
-
-    final_risk_score = risk_evaluation["score"]
-    final_risk_level = risk_evaluation["level"]
-    final_recommendation = risk_evaluation["recommendation"]
-    final_status = "UNDER_REVIEW" if final_risk_score >= 60.0 else "PROCESSING"
-
-    # 3. SAVE TO DATABASE
+    # 3. SAVE INITIAL STATE TO DATABASE
     new_claim = Claim(
         id=next_claim_num,
         claim_number=next_claim_num,
@@ -283,10 +284,10 @@ def create_claim(
         description=description,
         amount=amount,
         currency=currency,
-        status=final_status,
-        risk_score=final_risk_score,
-        risk_level=final_risk_level,
-        recommendation=final_recommendation,
+        status="QUEUED",
+        risk_score=0.0,
+        risk_level="UNKNOWN",
+        recommendation="",
         source_type=source_type,
         created_at=datetime.utcnow()
     )
@@ -300,94 +301,36 @@ def create_claim(
         file_name=saved_filename,
         file_type="image/jpeg",
         file_size=file_size,
-        storage_path=f"/demo-evidence/{saved_filename}" if source_type == "demo" else (f"/uploads/{ev_id}_{saved_filename}" if dest_path else "/damage.jpg"),
+        storage_path=supabase_url,
         sha256=file_hash,
         source_type=source_type,
         width=width,
         height=height,
-        processing_status="COMPLETED"
+        processing_status="QUEUED"
     )
     db.add(new_evidence)
-
-    # Forensic Result
-    f_record = ForensicResult(
-        evidence_id=ev_id,
-        metadata_anomaly=forensic_res["metadata_anomaly"],
-        possible_editing=forensic_res["possible_editing"],
-        compression_anomaly=forensic_res["compression_anomaly"],
-        clone_region=forensic_res["clone_region"],
-        resampling_indicator=forensic_res["resampling_indicator"],
-        quality_score=forensic_res["quality_score"],
-        manipulation_score=forensic_res["manipulation_score"],
-        details=forensic_res["details"],
-        created_at=datetime.utcnow()
-    )
-    db.add(f_record)
-
-    # Duplicate Result
-    d_record = DuplicateResult(
-        evidence_id=ev_id,
-        matched_evidence_id=duplicate_res.get("matched_evidence_id"),
-        similarity_score=duplicate_res.get("similarity_score", 0.0),
-        algorithm=duplicate_res.get("algorithm", "SHA256_DHASH"),
-        created_at=datetime.utcnow()
-    )
-    db.add(d_record)
-
-    # Provenance Result
-    p_record = ProvenanceResult(
-        evidence_id=ev_id,
-        c2pa_outcome=provenance_res["c2pa_outcome"],
-        c2pa_validation_state=provenance_res["c2pa_validation_state"],
-        c2pa_issuer=provenance_res.get("c2pa_issuer"),
-        c2pa_model=provenance_res.get("c2pa_model"),
-        synthid_outcome=provenance_res["synthid_outcome"],
-        source=provenance_res["source"],
-        raw_result=provenance_res["raw_result"],
-        created_at=datetime.utcnow()
-    )
-    db.add(p_record)
-
-    # Risk Score Result
-    r_record = RiskScore(
-        claim_id=new_claim.id,
-        provenance_score=float(provenance_res.get("signal_score", 0)),
-        synthid_score=0.0,
-        forensic_score=float(forensic_res.get("signal_score", 0)),
-        duplicate_score=float(duplicate_res.get("signal_score", 0)),
-        order_match_score=0.0 if order_exists else 25.0,
-        behaviour_score=float(behaviour_res.get("signal_score", 0)),
-        total_score=final_risk_score,
-        risk_level=final_risk_level,
-        recommendation=final_recommendation,
-        explanation=risk_evaluation["explanation"],
-        created_at=datetime.utcnow()
-    )
-    db.add(r_record)
-
-    # Audit Logs
+    
+    # Audit Log
     db.add(AuditLog(
         claim_id=new_claim.id,
         action="claim.created",
         details={"source_type": source_type, "file": saved_filename, "amount": amount},
         created_at=datetime.utcnow()
     ))
-    db.add(AuditLog(
+    db.commit()
+    
+    # Trigger Celery Task
+    from app.tasks import run_verification_pipeline
+    run_verification_pipeline.delay(
         claim_id=new_claim.id,
-        action="evidence.analyzed",
-        details={
-            "sha256": file_hash[:16] + "...",
-            "duplicate": duplicate_res["is_duplicate"],
-            "editing_flag": forensic_res["possible_editing"]
-        },
-        created_at=datetime.utcnow()
-    ))
-    db.add(AuditLog(
-        claim_id=new_claim.id,
-        action="risk.evaluated",
-        details={"score": final_risk_score, "level": final_risk_level, "signals": len(risk_evaluation["signals"])},
-        created_at=datetime.utcnow()
-    ))
+        ev_id=ev_id,
+        dest_path=dest_path,
+        source_type=source_type,
+        order_id=order_id,
+        customer_id=customer_id,
+        amount=amount,
+        file_hash=file_hash
+    )
 
     db.commit()
 
@@ -400,9 +343,9 @@ def create_claim(
         "recommendation": new_claim.recommendation,
         "source_type": new_claim.source_type,
         "evidence_id": ev_id,
-        "signals": risk_evaluation["signals"],
-        "explanation": risk_evaluation["explanation"],
-        "message": f"Claim verified via 5-signal pipeline. Risk: {final_risk_level} ({final_risk_score}/100)"
+        "signals": [],
+        "explanation": "Claim has been queued for verification.",
+        "message": "Claim queued. Verification pipeline started in background."
     }
 
 

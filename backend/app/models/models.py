@@ -101,6 +101,18 @@ class ClaimEvidence(Base):
     provenance = relationship("ProvenanceResult", back_populates="evidence", uselist=False)
     forensic = relationship("ForensicResult", back_populates="evidence", uselist=False)
     duplicate = relationship("DuplicateResult", back_populates="evidence", uselist=False)
+    ocr = relationship("OcrResult", back_populates="evidence", uselist=False)
+
+class OcrResult(Base):
+    __tablename__ = "ocr_results"
+    id = Column(Integer, primary_key=True, index=True)
+    evidence_id = Column(String, ForeignKey("claim_evidence.id"))
+    raw_text = Column(Text, nullable=True)
+    extracted_data = Column(JSON, nullable=True)
+    status = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    evidence = relationship("ClaimEvidence", back_populates="ocr")
 
 class ProvenanceResult(Base):
     __tablename__ = "provenance_results"

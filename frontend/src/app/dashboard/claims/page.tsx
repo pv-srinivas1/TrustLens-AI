@@ -35,6 +35,7 @@ export default function ClaimsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdNotice, setCreatedNotice] = useState<string | null>(null);
+  const [errorNotice, setErrorNotice] = useState<string | null>(null);
 
   // Form State
   const [customer, setCustomer] = useState("Customer #821");
@@ -69,6 +70,8 @@ export default function ClaimsPage() {
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorNotice(null);
+    setCreatedNotice(null);
 
     const parsedAmount = parseFloat(amount) || 500;
     const sourceType = selectedEvidence?.sourceType || "real_upload";
@@ -99,9 +102,14 @@ export default function ClaimsPage() {
         });
         if (res.ok) {
           backendData = await res.json();
+        } else {
+          throw new Error("No connection to TrustLens API. Claim was not submitted.");
         }
       } catch (err) {
-        console.log("Backend sync offline, store fallback active:", err);
+        console.error("Backend sync failed:", err);
+        setErrorNotice("No connection to TrustLens API. Claim was not submitted.");
+        setIsSubmitting(false);
+        return; // Stop here, do not use localStorage fallback
       }
 
       // 2. Add to frontend store (using real backend results if available)
@@ -386,6 +394,13 @@ export default function ClaimsPage() {
                 <div className="p-3 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] flex items-center text-[13px] font-bold">
                   <CheckCircle2 className="w-5 h-5 mr-2 shrink-0" />
                   <span>{createdNotice}</span>
+                </div>
+              )}
+
+              {errorNotice && (
+                <div className="p-3 bg-[#ff3d81] text-white border-2 border-[#111] rounded-[10px] flex items-center text-[13px] font-bold">
+                  <X className="w-5 h-5 mr-2 shrink-0" />
+                  <span>{errorNotice}</span>
                 </div>
               )}
 

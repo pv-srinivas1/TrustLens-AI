@@ -5,9 +5,11 @@ def calculate_evidence_risk(
     forensics: Dict[str, Any],
     duplicate: Dict[str, Any],
     behaviour: Dict[str, Any],
+    ocr: Dict[str, Any],
     order_exists: bool,
     order_amount_matches: bool,
-    claim_amount: float
+    claim_amount: float,
+    claim_order_id: str
 ) -> Dict[str, Any]:
     """
     Evidence-Fusion Risk Engine:
@@ -15,14 +17,9 @@ def calculate_evidence_risk(
     - Provenance (C2PA / AI metadata)
     - Forensics (Editing / EXIF anomalies)
     - Duplicates (Exact SHA-256 / Perceptual dHash)
+    - OCR (Text mismatch against claim data)
     - Order Verification (Merchant records match)
     - Behaviour (Claim frequency / velocity)
-
-    Risk Levels:
-    0–30: LOW (Recommendation: APPROVE_REFUND)
-    31–60: MEDIUM (Recommendation: REQUEST_MORE_EVIDENCE)
-    61–80: HIGH (Recommendation: MANUAL_REVIEW)
-    81–100: CRITICAL (Recommendation: ESCALATE_TO_FRAUD_TEAM)
     """
     score = 0.0
     signals: List[Dict[str, Any]] = []
@@ -76,7 +73,25 @@ def calculate_evidence_risk(
             "impact": "HIGH"
         })
 
-    # 4. Order Verification Signal
+    # 4. OCR Context Mismatch Signal
+    if ocr and ocr.get("status") == "COMPLETED":
+        extracted = ocr.get("extracted_data", {})
+        ocr_order_ids = extracted.get("possible_order_ids", [])
+        
+        # If OCR found order IDs but the claimed order ID is NOT among them
+        if ocr_order_ids and claim_order_id:
+            # simple check if claimed order ID is a substring of any extracted ID or vice-versa
+            match_found = any(claim_order_id.lower() in oid.lower() or oid.lower() in claim_order_id.lower() for oid in ocr_order_ids)
+            if not match_found:
+                score += 15.0
+                signals.append({
+                    "category": "OCR",
+                    "name": f"OCR mismatch: Claimed '{claim_order_id}' not found in receipt/label",
+                    "weight": "+15",
+                    "impact": "MEDIUM"
+                })
+
+    # 5. Order Verification Signal
     if not order_exists:
         score += 25.0
         signals.append({
@@ -94,7 +109,7 @@ def calculate_evidence_risk(
             "impact": "MEDIUM"
         })
 
-    # 5. Customer Behaviour Signal
+    # 6. Customer Behaviour Signal
     beh_score = behaviour.get("anomaly_score", 0.0)
     if beh_score >= 70.0:
         score += 20.0
@@ -131,7 +146,7 @@ def calculate_evidence_risk(
         recommendation = "APPROVE_REFUND"
 
     # Detailed explanation
-    explanation = f"Evaluated 5 verification layers. Result: {risk_level} risk ({int(total_score)}/100). "
+    explanation = f"Evaluated 6 verification layers. Result: {risk_level} risk ({int(total_score)}/100). "
     if signals:
         explanation += "Triggered: " + ", ".join(s["name"] for s in signals)
     else:
