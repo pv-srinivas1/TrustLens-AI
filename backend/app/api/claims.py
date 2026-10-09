@@ -3,7 +3,7 @@ import uuid
 import hashlib
 from datetime import datetime
 from typing import Optional, List, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 from PIL import Image as PILImage
 
@@ -181,6 +181,7 @@ def get_claim(claim_id: str, db: Session = Depends(get_db)):
 # =========================================================================
 @router.post("/")
 def create_claim(
+    background_tasks: BackgroundTasks,
     customer_id: str = Form(...),
     order_id: str = Form(...),
     claim_type: str = Form(...),
@@ -319,9 +320,11 @@ def create_claim(
     ))
     db.commit()
     
-    # Trigger Celery Task
+    # Trigger Background Task instead of Celery (No Redis required)
     from app.tasks import run_verification_pipeline
-    run_verification_pipeline.delay(
+    background_tasks.add_task(
+        run_verification_pipeline,
+        None, # self
         claim_id=new_claim.id,
         ev_id=ev_id,
         dest_path=dest_path,
