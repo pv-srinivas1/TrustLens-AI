@@ -156,9 +156,10 @@ def create_header(title: str, subtitle: str, org_name: str = "TrustLens Technolo
     now_str = datetime.utcnow().strftime("%d %b %Y, %H:%M UTC")
     
     # Try to load the logo
-    logo_path = os.path.abspath(os.path.join(os.getcwd(), "..", "frontend", "public", "logo.png"))
+    logo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "static", "logo.png"))
     if not os.path.exists(logo_path):
-        logo_path = os.path.abspath(os.path.join(os.getcwd(), "frontend", "public", "logo.png"))
+        # Fallback to current working directory
+        logo_path = os.path.abspath(os.path.join(os.getcwd(), "static", "logo.png"))
         
     left_cell = []
     if os.path.exists(logo_path):
