@@ -155,14 +155,33 @@ def create_header(title: str, subtitle: str, org_name: str = "TrustLens Technolo
     styles = get_styles()
     now_str = datetime.utcnow().strftime("%d %b %Y, %H:%M UTC")
     
+    # Try to load the logo
+    logo_path = os.path.abspath(os.path.join(os.getcwd(), "..", "frontend", "public", "logo.png"))
+    if not os.path.exists(logo_path):
+        logo_path = os.path.abspath(os.path.join(os.getcwd(), "frontend", "public", "logo.png"))
+        
+    left_cell = []
+    if os.path.exists(logo_path):
+        try:
+            logo_img = RLImage(logo_path, width=1.8 * inch, height=0.45 * inch)
+            logo_img.hAlign = 'LEFT'
+            left_cell.append(logo_img)
+        except Exception:
+            left_cell.append(Paragraph("<b>TRUSTLENS AI</b>", styles['DocTitle']))
+    else:
+        left_cell.append(Paragraph("<b>TRUSTLENS AI</b>", styles['DocTitle']))
+
+    left_cell.append(Spacer(1, 4))
+    left_cell.append(Paragraph("SEE THE EVIDENCE. VERIFY THE CLAIM.", styles['Tagline']))
+    
     header_data = [
         [
-            Paragraph("<b>TRUSTLENS AI</b>", styles['DocTitle']),
-            Paragraph(f"<b>{org_name}</b><br/>Exported: {now_str}", styles['MetaText'])
-        ],
-        [
-            Paragraph("SEE THE EVIDENCE. VERIFY THE CLAIM.", styles['Tagline']),
-            Paragraph(f"Report Type: <b>{title}</b>", styles['MetaText'])
+            left_cell,
+            [
+                Paragraph(f"<b>{org_name}</b><br/>Exported: {now_str}", styles['MetaText']),
+                Spacer(1, 10),
+                Paragraph(f"Report Type: <b>{title}</b>", styles['MetaText'])
+            ]
         ]
     ]
 
@@ -501,15 +520,45 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     story.append(sig_table)
     story.append(Spacer(1, 10))
 
+    # Flowchart Visualizer
+    story.append(Paragraph("AI Verification Pipeline Path", styles['SectionTitle']))
+    flowchart_data = [
+        [
+            Paragraph("<b>Ingest</b>", styles['CellHeader']),
+            Paragraph("<b>Analyze</b>", styles['CellHeader']),
+            Paragraph("<b>Forensics</b>", styles['CellHeader']),
+            Paragraph("<b>Decision</b>", styles['CellHeader'])
+        ],
+        [
+            Paragraph("Image received<br/>Hashes generated", styles['CellText']),
+            Paragraph("Supabase Storage<br/>C2PA / SynthID", styles['CellText']),
+            Paragraph("EXIF / Compression<br/>Duplicate Search", styles['CellText']),
+            Paragraph(f"<b>{r_level.upper()} RISK</b><br/>Score: {int(r_score)}/100", styles['CellTextBold'])
+        ]
+    ]
+    flow_table = Table(flowchart_data, colWidths=[120, 120, 120, 120])
+    flow_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e293b")),
+        ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor("#f8fafc")),
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+    ]))
+    story.append(flow_table)
+    story.append(Spacer(1, 12))
+
     # Evidence & Image Section
     story.append(Paragraph("Uploaded Evidence Artifact", styles['SectionTitle']))
     ev_item = (evidence_list[0] if evidence_list else None) or getattr(claim, "evidence", [None])[0]
     
     ev_meta = [
-        [Paragraph("Evidence ID", styles['CellTextBold']), Paragraph(getattr(ev_item, "id", "EV-82921"), styles['CellText'])],
+        [Paragraph("Evidence ID", styles['CellTextBold']), Paragraph(getattr(ev_item, "id", "EV-UNKNOWN"), styles['CellText'])],
         [Paragraph("File Name", styles['CellTextBold']), Paragraph(getattr(ev_item, "file_name", "damage.jpg"), styles['CellText'])],
         [Paragraph("File Size / Type", styles['CellTextBold']), Paragraph(f"{getattr(ev_item, 'file_size', 2480112) / 1024 / 1024:.1f} MB (JPEG)", styles['CellText'])],
-        [Paragraph("SHA-256 Hash", styles['CellTextBold']), Paragraph(getattr(ev_item, "sha256", "a9f43b77e81029da483cf29188e0182c402198be9031"), styles['CellText'])],
+        [Paragraph("SHA-256 Hash", styles['CellTextBold']), Paragraph(getattr(ev_item, "sha256", "UNKNOWN"), styles['CellText'])],
     ]
     ev_table = Table(ev_meta, colWidths=[120, 367])
     ev_table.setStyle(TableStyle([
@@ -521,7 +570,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     story.append(ev_table)
     story.append(Spacer(1, 8))
 
-    # Try to securely embed the real image if it exists on disk
+    # Try to securely embed the real image if it exists on disk or via URL
     embedded_img = False
     candidate_paths = [
         image_bytes_or_path,
@@ -530,22 +579,39 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         os.path.join(os.getcwd(), "frontend", "public", "damage.jpg"),
         os.path.abspath(os.path.join(os.getcwd(), "..", "frontend", "public", "damage.jpg")),
     ]
+    
     for path in candidate_paths:
-        if path and isinstance(path, str) and os.path.exists(path) and os.path.isfile(path):
+        if not path:
+            continue
+            
+        rl_img = None
+        if isinstance(path, str) and path.startswith("http"):
+            try:
+                import urllib.request
+                from io import BytesIO
+                req = urllib.request.Request(path, headers={'User-Agent': 'Mozilla/5.0'})
+                with urllib.request.urlopen(req, timeout=5) as response:
+                    img_data = response.read()
+                rl_img = RLImage(BytesIO(img_data), width=4.5 * inch, height=3.0 * inch)
+            except Exception as e:
+                print("Failed to download image URL for PDF:", e)
+        elif isinstance(path, str) and os.path.exists(path) and os.path.isfile(path):
             try:
                 rl_img = RLImage(path, width=4.5 * inch, height=3.0 * inch)
-                story.append(KeepTogether([
-                    Paragraph("<b>Evidence Visual Capture:</b>", styles['MetaText']),
-                    Spacer(1, 4),
-                    rl_img
-                ]))
-                embedded_img = True
-                break
             except Exception:
                 pass
 
+        if rl_img:
+            story.append(KeepTogether([
+                Paragraph("<b>Real Uploaded Evidence Image:</b>", styles['MetaText']),
+                Spacer(1, 4),
+                rl_img
+            ]))
+            embedded_img = True
+            break
+
     if not embedded_img:
-        story.append(Paragraph("<i>[Evidence file stored securely in Supabase Storage]</i>", styles['MetaText']))
+        story.append(Paragraph("<i>[Evidence file stored securely in Supabase Storage - Thumbnail not available]</i>", styles['MetaText']))
 
     story.append(Spacer(1, 12))
 
