@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api import claims, exports
 
 app = FastAPI(
-    title="TrustLens AI API",
+    title="TrustLens Technologies API",
     description="AI-Powered Refund & Claim Verification Platform",
     version="1.0.0"
 )
@@ -28,7 +28,7 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to TrustLens AI API"}
+    return {"message": "Welcome to TrustLens Technologies API"}
 
 @app.get("/health")
 def health_check():

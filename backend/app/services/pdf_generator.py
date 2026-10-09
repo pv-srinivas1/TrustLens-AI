@@ -35,7 +35,7 @@ class NumberedCanvas(canvas.Canvas):
 
         # Running Top Header (on page 2+)
         if self._pageNumber > 1:
-            self.drawString(54, 842 - 36, "TRUSTLENS AI — Verification Report")
+            self.drawString(54, 842 - 36, "TrustLens Technologies — Verification Report")
             self.setStrokeColor(colors.HexColor("#e2e8f0"))
             self.setLineWidth(0.5)
             self.line(54, 842 - 42, 595 - 54, 842 - 42)
@@ -46,7 +46,7 @@ class NumberedCanvas(canvas.Canvas):
         self.setLineWidth(0.5)
         self.line(54, footer_y + 12, 595 - 54, footer_y + 12)
 
-        self.drawString(54, footer_y, "Confidential • TrustLens AI Verification Platform")
+        self.drawString(54, footer_y, "Confidential • TrustLens Technologies Verification Platform")
         page_str = f"Page {self._pageNumber} of {page_count}"
         self.drawRightString(595 - 54, footer_y, page_str)
         self.restoreState()
@@ -168,9 +168,9 @@ def create_header(title: str, subtitle: str, org_name: str = "TrustLens Technolo
             logo_img.hAlign = 'LEFT'
             left_cell.append(logo_img)
         except Exception:
-            left_cell.append(Paragraph("<b>TRUSTLENS AI</b>", styles['DocTitle']))
+            left_cell.append(Paragraph("<b>TrustLens Technologies</b>", styles['DocTitle']))
     else:
-        left_cell.append(Paragraph("<b>TRUSTLENS AI</b>", styles['DocTitle']))
+        left_cell.append(Paragraph("<b>TrustLens Technologies</b>", styles['DocTitle']))
 
     left_cell.append(Spacer(1, 4))
     left_cell.append(Paragraph("SEE THE EVIDENCE. VERIFY THE CLAIM.", styles['Tagline']))

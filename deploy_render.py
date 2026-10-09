@@ -1,0 +1,18 @@
+import requests
+
+RENDER_API_KEY = "your-render-api-key"
+headers = {
+    "Authorization": f"Bearer {RENDER_API_KEY}",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+
+service_id = "srv-db4be5ijnfac73arqdfg"
+
+payload = {
+    "clearCache": "clear"
+}
+
+resp = requests.post(f"https://api.render.com/v1/services/{service_id}/deploys", headers=headers, json=payload)
+print(resp.status_code)
+print(resp.json())

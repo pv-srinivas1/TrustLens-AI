@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from sqlalchemy.orm import Session
-from app.celery_app import celery_app
 from app.database import SessionLocal
 from app.models.models import (
     Claim, ClaimEvidence, AuditLog,
@@ -14,9 +13,7 @@ from app.engines.behaviour.analyzer import analyze_customer_behaviour
 from app.engines.risk.analyzer import calculate_evidence_risk
 from app.engines.ocr.analyzer import analyze_ocr
 
-@celery_app.task(bind=True)
 def run_verification_pipeline(
-    self, 
     claim_id: str, 
     ev_id: str, 
     dest_path: str, 

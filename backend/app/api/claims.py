@@ -324,7 +324,6 @@ def create_claim(
     from app.tasks import run_verification_pipeline
     background_tasks.add_task(
         run_verification_pipeline,
-        None, # self
         claim_id=new_claim.id,
         ev_id=ev_id,
         dest_path=dest_path,
