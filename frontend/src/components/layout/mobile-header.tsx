@@ -11,31 +11,29 @@ interface MobileHeaderProps {
 
 export function MobileHeader({ onMenuOpen, isOpen = false, pageTitle }: MobileHeaderProps) {
   return (
-    <header className="md:hidden h-14 sm:h-16 w-full border-b-2 border-[#111]/10 bg-white/95 backdrop-blur-md flex items-center justify-between px-3 sm:px-4 shrink-0 z-30 select-none">
+    <header className="md:hidden h-14 sm:h-16 w-full border-b border-[#E5E7EB] bg-white/95 backdrop-blur-md flex items-center justify-between px-3 sm:px-4 shrink-0 z-30 select-none">
       <div className="flex items-center space-x-2.5">
-        {/* Hamburger with >= 44x44px touch target */}
         <button
           onClick={onMenuOpen}
-          className="w-11 h-11 flex items-center justify-center border-2 border-[#111] rounded-[10px] bg-white text-[#111] hover:bg-[#ffd23f] active:bg-[#ffd23f] transition-colors focus:outline-none focus:ring-2 focus:ring-[#111]"
+          className="w-10 h-10 flex items-center justify-center border border-[#E5E7EB] rounded-md bg-white text-[#4B5563] hover:bg-[#F3F4F6] transition-colors focus:outline-none"
           aria-label="Open navigation menu"
           aria-expanded={isOpen}
         >
-          <Menu className="w-5 h-5" strokeWidth={2.5} />
+          <Menu className="w-5 h-5" strokeWidth={2} />
         </button>
 
-        {/* Brand Link */}
         <Link href="/dashboard" className="flex items-center space-x-2">
           <img 
             src="/logo.png" 
-            alt="TRUSTLENS TECHNOLOGIES Logo" 
+            alt="TRUSTLENS AI Logo" 
             className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
           />
           <div className="flex flex-col">
-            <span className="font-display text-[15px] sm:text-[16px] text-[#111] tracking-tight leading-none">
-              TRUSTLENS TECHNOLOGIES
+            <span className="font-sans text-[15px] font-semibold text-[#111827] tracking-tight leading-none">
+              TrustLens AI
             </span>
             {pageTitle && (
-              <span className="font-mono text-[9px] text-[#737373] uppercase tracking-wider font-semibold">
+              <span className="font-sans text-[10px] text-[#6B7280] font-medium mt-0.5">
                 {pageTitle}
               </span>
             )}
@@ -44,8 +42,8 @@ export function MobileHeader({ onMenuOpen, isOpen = false, pageTitle }: MobileHe
       </div>
 
       <div className="flex items-center space-x-2">
-        <span className="inline-flex items-center px-2 py-1 bg-[#3ddc97] border-2 border-[#111] rounded-full text-[10px] font-bold text-[#111] neo-shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#111] mr-1.5 animate-pulse" />
+        <span className="inline-flex items-center px-2 py-1 bg-[#ECFDF5] border border-[#A7F3D0] rounded-full text-[10px] font-semibold text-[#065F46]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] mr-1.5 animate-pulse" />
           ONLINE
         </span>
       </div>

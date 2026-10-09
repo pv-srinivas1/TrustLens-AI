@@ -2,474 +2,337 @@
 
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { 
-  ArrowLeft, 
-  Download, 
-  ExternalLink, 
   AlertTriangle, 
   CheckCircle2, 
-  ShieldCheck, 
   Clock, 
-  FileText, 
-  User, 
-  ShoppingBag, 
-  Layers, 
-  ChevronRight, 
-  X, 
-  FileQuestion,
-  Camera,
-  Upload
+  Upload,
+  ZoomIn,
+  ZoomOut,
+  Maximize,
+  Info,
+  ChevronDown,
+  ChevronRight,
+  ShieldAlert,
+  FileCheck2,
+  FileSearch,
+  Fingerprint,
+  RefreshCcw,
+  Activity,
+  History,
+  UserCheck
 } from "lucide-react";
 import { useTrustLens } from "@/lib/store";
 import { ExportMenu } from "@/components/ui/export-menu";
+import { apiUrl } from "@/lib/api";
 
-function ClaimDetailContent() {
-  const router = useRouter();
-  const params = useParams();
-  const claimId = (params?.id as string) || "CLM-1001";
-  const { claims, updateClaimDecision } = useTrustLens();
-
-  // Find claim or fallback to CLM-1001 template
-  const claim = claims.find((c) => c.id === claimId) || claims[0];
-
-  const sourceType = (claim as any).sourceType || (claim.id === "CLM-1001" || claim.type.includes("Package") ? "demo" : "real_upload");
-  const isDemo = sourceType === "demo";
-  const isCamera = sourceType === "camera_capture";
-
-  const imageSrc = claim.evidenceFile?.startsWith("http") || claim.evidenceFile?.startsWith("blob")
-    ? claim.evidenceFile
-    : claim.evidenceFile?.startsWith("/")
-      ? claim.evidenceFile
-      : claim.evidenceFile?.includes("damaged-") || claim.evidenceFile?.includes("missing-") || claim.evidenceFile?.includes("delivery-") || claim.evidenceFile?.includes("wrong-") || claim.evidenceFile?.includes("receipt-")
-        ? `/demo-evidence/${claim.evidenceFile}`
-        : "/damage.jpg";
-
-  // Review Modal state
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [selectedDecision, setSelectedDecision] = useState<"Approved" | "Rejected" | "Escalated" | "Awaiting Evidence">("Approved");
-  const [decisionReason, setDecisionReason] = useState("Evidence does not sufficiently support damage occurred during delivery.");
-  const [actionDoneMsg, setActionDoneMsg] = useState<string | null>(null);
-
-  const handleDecisionSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateClaimDecision(claim.id, selectedDecision, decisionReason);
-    setActionDoneMsg(`Claim ${claim.id} updated to ${selectedDecision}. Audit log recorded.`);
-    setTimeout(() => {
-      setIsReviewModalOpen(false);
-      setActionDoneMsg(null);
-    }, 1200);
-  };
-
-  // Processing Animation state
-  const isProcessing = claim.status === "PENDING" || claim.status === "UNDER_REVIEW";
-  const [progress, setProgress] = useState(isProcessing ? 0 : 100);
-
-  useEffect(() => {
-    if (isProcessing) {
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            // Simulate backend finishing after 20 seconds
-            if (claim.status === "PENDING" || claim.status === "UNDER_REVIEW") {
-              updateClaimDecision(claim.id, "Escalated", "Automated AI Analysis Completed");
-            }
-            return 100;
-          }
-          const increment = prev > 85 ? 1 : prev > 50 ? 2 : 4;
-          return Math.min(prev + increment, 100);
-        });
-      }, 500);
-      return () => clearInterval(interval);
-    } else {
-      setProgress(100);
-    }
-  }, [isProcessing, claim.id, claim.status, updateClaimDecision]);
-
+function InspectorSection({ title, icon: Icon, children, defaultOpen = true }: { title: string, icon: any, children: React.ReactNode, defaultOpen?: boolean }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
-    <div className="space-y-2 pb-2">
-      {/* Back Link */}
-      <div>
-        <Link 
-          href="/dashboard/claims"
-          className="inline-flex items-center text-[13px] font-bold text-[#111] hover-underline"
-        >
-          <ArrowLeft className="w-4 h-4 mr-1.5" strokeWidth={2.5} /> Claims
-        </Link>
-      </div>
-
-      {/* Header Banner */}
-      <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-3 flex-wrap">
-              <span className="font-mono text-[14px] font-bold bg-[#ffd23f] border-2 border-[#111] px-2.5 py-0.5 rounded-md neo-shadow-sm">
-                {claim.id}
-              </span>
-              {isDemo && (
-                <span className="px-2 py-0.5 bg-[#ff3d81] text-[#111] border-2 border-[#111] rounded text-[11px] font-black uppercase tracking-wider neo-shadow-xs">
-                  DEMO CLAIM
-                </span>
-              )}
-              <h1 className="font-display text-[16px] uppercase text-[#111] leading-none">
-                {claim.type}
-              </h1>
-              <span className="font-mono font-bold text-[20px] text-[#111]">
-                ₹{claim.amount.toLocaleString()}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 text-[13px] font-medium text-[#111]/70 flex-wrap">
-              <span className="flex items-center"><User className="w-3.5 h-3.5 mr-1" /> {claim.customer}</span>
-              <span>•</span>
-              <span className="flex items-center"><ShoppingBag className="w-3.5 h-3.5 mr-1" /> Order: <strong className="text-[#111] ml-1">{claim.orderId}</strong></span>
-              <span>•</span>
-              <span>Platform: <strong className="text-[#111]">{claim.platform}</strong></span>
-              <span>•</span>
-              <span className="flex items-center"><Clock className="w-3.5 h-3.5 mr-1" /> {claim.createdAt}</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
-            {progress < 100 ? (
-              <button disabled className="px-4 py-1.5 min-h-[36px] bg-[#111] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-white opacity-80 flex items-center justify-center">
-                <Clock className="w-4 h-4 mr-2 animate-spin" /> Analyzing... {progress}%
-              </button>
-            ) : (
-              <ExportMenu type="claim_detail" claimId={claim.id} buttonLabel="Export PDF" />
-            )}
-          </div>
+    <div className="border-b border-[#E5E7EB] last:border-0">
+      <button 
+        onClick={() => setIsOpen(!isOpen)} 
+        className="w-full flex items-center justify-between py-3 px-4 hover:bg-[#F9FAFB] transition-colors focus:outline-none"
+      >
+        <div className="flex items-center space-x-2 text-[#111827]">
+          <Icon className="w-4 h-4 text-[#6B7280]" strokeWidth={2} />
+          <span className="font-semibold text-[13px]">{title}</span>
         </div>
-
-        {/* Risk Banner Badge or Loading Banner */}
-        <div className="mt-2 pt-2 border-t-2 border-[#111]/10 flex flex-col w-full gap-1">
-          {progress < 100 ? (
-            <div className="w-full">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-[13px] text-[#111]">AI Forensics Pipeline Running...</span>
-                <span className="font-bold text-[13px] text-[#111]">{progress}%</span>
-              </div>
-              <div className="w-full h-4 border-2 border-[#111] bg-white rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-[#ff3d81] transition-all duration-300 ease-out"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between flex-wrap gap-2 w-full">
-              <div className="flex items-center space-x-2">
-                <span className={`inline-flex items-center px-3 py-1 rounded-full border-2 border-[#111] font-display text-[12px] tracking-wide ${
-                  claim.riskLevel === 'CRITICAL' ? 'bg-[#c8a2ff]' :
-                  claim.riskLevel === 'HIGH' ? 'bg-[#ff3d81]' : 
-                  claim.riskLevel === 'MEDIUM' ? 'bg-[#ffd23f]' : 'bg-[#3ddc97]'
-                }`}>
-                  <AlertTriangle className="w-3.5 h-3.5 mr-1.5" strokeWidth={3} />
-                  {claim.riskLevel} VERIFICATION RISK ({claim.riskScore}/100)
-                </span>
-                <span className="text-[12px] font-mono font-bold text-[#111]/70">
-                  STATUS: {claim.status.toUpperCase()}
-                </span>
-              </div>
-
-              {claim.duplicateMatch && (
-                <div className="flex items-center px-3 py-1 bg-[#ffd23f] border-2 border-[#111] rounded-md text-[11px] font-bold">
-                  <span>⚠ {claim.duplicateMatch.similarity}% visual similarity to {claim.duplicateMatch.claimId}</span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Main Grid: Evidence on Left (5/12), Verification & Risk on Right (7/12) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
-        
-        {/* Left Column: Uploaded Evidence (5 cols) */}
-        <div className="lg:col-span-5 space-y-2">
-          <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-bold text-[16px] text-[#111] flex items-center">
-                <Layers className="w-4 h-4 mr-2" strokeWidth={2.5} />
-                Evidence
-              </h2>
-              <span className="text-[11px] font-mono font-bold text-[#111]/60">1 FILE ATTACHED</span>
-            </div>
-
-            {/* Actual Uploaded Image */}
-            <div className="relative w-full aspect-[4/3] bg-[#fdf9f0] border-2 border-[#111] rounded-[12px] overflow-hidden neo-shadow-sm group flex items-center justify-center">
-              <img 
-                src={imageSrc} 
-                alt="Uploaded Evidence" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  if (!target.src.includes("/damage.jpg")) {
-                    target.src = "/damage.jpg";
-                  }
-                }}
-              />
-              <div className="absolute top-2 right-2 px-2 py-0.5 bg-[#111] text-white font-mono text-[10px] font-bold rounded">
-                JPG • 1280×960
-              </div>
-              {isDemo && (
-                <div className="absolute top-2 left-2 px-2 py-0.5 bg-[#ffd23f] text-[#111] border border-[#111] font-mono text-[10px] font-black rounded uppercase">
-                  DEMO EVIDENCE
-                </div>
-              )}
-            </div>
-
-            {/* File Metadata Details */}
-            <div className="mt-4 p-3 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] space-y-1.5 text-[12px]">
-              <div className="flex justify-between items-center">
-                <span className="text-[#111]/70 font-medium">Evidence Source:</span>
-                <span className={`px-2 py-0.5 border border-[#111] rounded font-bold text-[11px] ${
-                  isDemo ? "bg-[#ffd23f] text-[#111]" : isCamera ? "bg-[#a0e7e5] text-[#111]" : "bg-[#3ddc97] text-[#111]"
-                }`}>
-                  {isDemo ? "Demo Evidence" : isCamera ? "Camera Capture" : "User Uploaded"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#111]/70 font-medium">Claim Source:</span>
-                <span className="font-bold text-[#111]">{isDemo ? "Demo" : "Real"}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#111]/70 font-medium">Filename:</span>
-                <span className="font-mono font-bold text-[#111]">{claim.evidenceFile || "damage.jpg"}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#111]/70 font-medium">File Size:</span>
-                <span className="font-mono font-bold text-[#111]">{claim.evidenceSize || "2.4 MB"}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#111]/70 font-medium">SHA-256:</span>
-                <span className="font-mono font-bold text-[#111] truncate max-w-[200px]" title={claim.evidenceHash}>
-                  {claim.evidenceHash || "a9f43b77e810..."}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#111]/70 font-medium">Capture Device:</span>
-                <span className="font-medium text-[#111]">{isCamera ? "Web Camera (Browser)" : "Apple iPhone 13 (iOS 17.4)"}</span>
-              </div>
-            </div>
-
-            {/* View / Download Actions */}
-            <div className="mt-4 flex items-center gap-2">
-              <a 
-                href={imageSrc} 
-                target="_blank" 
-                rel="noreferrer"
-                className="flex-1 py-2 text-center bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
-              >
-                View Full Resolution
-              </a>
-              <a 
-                href={imageSrc} 
-                download={claim.evidenceFile || "damage.jpg"}
-                className="flex items-center justify-center px-4 py-2 bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
-              >
-                <Download className="w-4 h-4 mr-1.5" /> Download
-              </a>
-            </div>
-          </div>
-
-          {/* Description Box */}
-          <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
-            <h3 className="font-bold text-[14px] text-[#111] mb-2">Customer Statement</h3>
-            <p className="text-[13px] text-[#111]/80 leading-relaxed bg-[#fdf9f0] p-3 border-2 border-[#111] rounded-[10px]">
-              &quot;{claim.description}&quot;
-            </p>
-          </div>
-        </div>
-
-        {/* Right Column: Verification Engine & Risk Signals (7 cols) */}
-        <div className="lg:col-span-7 space-y-2">
-          
-          {/* Verification Pipeline Card */}
-          <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="font-bold text-[18px] text-[#111]">Verification Pipeline</h2>
-                <p className="text-[12px] text-[#111]/60 font-medium">Automated multi-signal forensic checks</p>
-              </div>
-              <span className="px-2.5 py-1 bg-[#3ddc97] border-2 border-[#111] rounded-full font-mono text-[11px] font-bold">
-                9/9 ENGINES EVALUATED
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-              {[
-                { name: "File Security", status: "✓ Passed", ok: true, detail: "Clean structure, no payloads" },
-                { name: "Provenance", status: "✓ Checked", ok: true, detail: "EXIF device metadata intact" },
-                { name: "C2PA", status: "Not detected", ok: true, detail: "No cryptographic signature" },
-                { name: "SynthID", status: "Not detected", ok: true, detail: "No generative watermark" },
-                { name: "Image Forensics", status: "⚠ Indicators found", ok: false, detail: "Compression edge anomaly detected" },
-                { name: "OCR", status: "✓ Completed", ok: true, detail: "Waybill order ID matches ORD-98231" },
-                { name: "Duplicate Search", status: "⚠ Similar evidence", ok: false, detail: "94% perceptual hash match in DB" },
-                { name: "Order Verification", status: "✓ Matched", ok: true, detail: "Timestamp matches delivery window" },
-                { name: "Behaviour", status: "✓ Completed", ok: true, detail: "Account anomaly index evaluated" },
-              ].map((item, idx) => (
-                <div 
-                  key={idx}
-                  className={`p-3 rounded-[10px] border-2 border-[#111] flex items-center justify-between ${
-                    !item.ok ? "bg-[#ff6b5e]/15 border-[#111]" : "bg-[#fdf9f0]"
-                  }`}
-                >
-                  <div>
-                    <span className="font-bold text-[13px] text-[#111] block leading-tight">{item.name}</span>
-                    <span className="text-[10px] text-[#111]/70 font-mono">{item.detail}</span>
-                  </div>
-                  <span className={`font-mono text-[11px] font-bold px-2 py-0.5 rounded border border-[#111] ${
-                    !item.ok ? "bg-[#ff6b5e] text-white" : "bg-white text-[#111]"
-                  }`}>
-                    {item.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Risk Assessment & Signals Breakdown Card */}
-          <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="font-bold text-[18px] text-[#111]">Verification Risk Breakdown</h2>
-                <p className="text-[12px] text-[#111]/60 font-medium">Explainable risk composition model</p>
-              </div>
-              <div className="text-right">
-                <span className="font-display text-[26px] text-[#111]">{claim.riskScore}</span>
-                <span className="text-[14px] text-[#111]/60 font-bold"> / 100</span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="text-[13px] font-bold uppercase tracking-wider text-[#111]/70">
-                Risk Signals Contribution
-              </div>
-
-              <div className="space-y-2">
-                {[
-                  { signal: "Manipulation indicators", score: "+20", level: "high", desc: "Cloning stamps and altered box fold contours" },
-                  { signal: "Similar evidence", score: "+15", level: "high", desc: "Matched prior claim image hash EV-81090" },
-                  { signal: "Order mismatch", score: "+0", level: "neutral", desc: "Order details match merchant payload" },
-                  { signal: "Behaviour anomaly", score: "+12", level: "med", desc: "Repeat claims pattern from device fingerprint" },
-                  { signal: "Provenance signal", score: "+0", level: "neutral", desc: "Camera metadata consistent" },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2.5 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px]">
-                    <div>
-                      <span className="font-bold text-[13px] text-[#111]">{item.signal}</span>
-                      <p className="text-[11px] text-[#111]/60">{item.desc}</p>
-                    </div>
-                    <span className={`font-mono font-bold text-[13px] px-2.5 py-0.5 rounded border-2 border-[#111] ${
-                      item.score === '+0' ? 'bg-white text-[#111]' : 'bg-[#ff3d81] text-[#111]'
-                    }`}>
-                      {item.score}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom summary note */}
-            <div className="mt-1 p-3.5 bg-[#ffd23f]/30 border-2 border-[#111] rounded-[10px] text-[12px] font-medium text-[#111]">
-              <strong>AI Recommendation:</strong> Due to duplicate image detection (94%) and manipulation artifacts, request a live re-capture of the package with the delivery receipt or reject according to policy.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Review Modal */}
-      {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-2 bg-[#111]/60 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-xl max-w-[calc(100vw-24px)] max-h-[90vh] bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between p-2 sm:p-2 border-b-2 border-[#111] bg-[#fdf9f0]">
-              <div>
-                <h3 className="font-display text-[17px] sm:text-[20px] uppercase text-[#111]">Claim Review: {claim.id}</h3>
-                <p className="text-[11px] sm:text-[12px] text-[#111]/70 font-medium">Record human reviewer determination and audit reason.</p>
-              </div>
-              <button 
-                onClick={() => setIsReviewModalOpen(false)}
-                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm hover-neo-sm transition-transform shrink-0"
-              >
-                <X className="w-4 h-4 text-[#111]" strokeWidth={3} />
-              </button>
-            </div>
-
-            <form onSubmit={handleDecisionSubmit} className="p-2 sm:p-2 space-y-1 sm:space-y-5 overflow-y-auto">
-              {actionDoneMsg && (
-                <div className="p-3 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] flex items-center text-[13px] font-bold">
-                  <CheckCircle2 className="w-5 h-5 mr-2" />
-                  {actionDoneMsg}
-                </div>
-              )}
-
-              <div>
-                <label className="font-bold text-[12px] uppercase tracking-wide block mb-2">Review Decision</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {[
-                    { label: "Approve Refund", value: "Approved", color: "hover:bg-[#3ddc97]" },
-                    { label: "Partial Refund", value: "Approved", color: "hover:bg-[#ffd23f]" },
-                    { label: "Request More Evidence", value: "Awaiting Evidence", color: "hover:bg-[#c8a2ff]" },
-                    { label: "Escalate to Fraud Team", value: "Escalated", color: "hover:bg-[#ff3d81]" },
-                    { label: "Reject (Policy)", value: "Rejected", color: "hover:bg-[#ff6b5e]" },
-                  ].map((btn, i) => (
-                    <button
-                      type="button"
-                      key={i}
-                      onClick={() => setSelectedDecision(btn.value as any)}
-                      className={`p-3 min-h-[32px] border-2 border-[#111] rounded-[10px] font-bold text-[13px] text-left transition-all ${
-                        selectedDecision === btn.value ? "bg-[#111] text-white neo-shadow-sm" : `bg-white text-[#111] ${btn.color}`
-                      }`}
-                    >
-                      {btn.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="font-bold text-[12px] uppercase tracking-wide block">Reason / Auditor Note</label>
-                <textarea 
-                  rows={3} 
-                  required
-                  value={decisionReason}
-                  onChange={(e) => setDecisionReason(e.target.value)}
-                  placeholder="State the justification for this decision (required for audit compliance)..."
-                  className="w-full p-3 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px] font-medium focus:outline-none focus:bg-white resize-none" 
-                />
-              </div>
-
-              <div className="flex flex-col-reverse sm:flex-row gap-2 sm:space-x-3 pt-3 border-t-2 border-[#111] items-stretch sm:items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => setIsReviewModalOpen(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 min-h-[32px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
-                >
-                  Confirm Decision
-                </button>
-              </div>
-            </form>
-          </div>
+        {isOpen ? <ChevronDown className="w-4 h-4 text-[#9CA3AF]" /> : <ChevronRight className="w-4 h-4 text-[#9CA3AF]" />}
+      </button>
+      {isOpen && (
+        <div className="px-4 pb-4 pt-1">
+          {children}
         </div>
       )}
     </div>
   );
 }
 
+function ClaimDetailContent() {
+  const params = useParams();
+  const router = useRouter();
+  const claimId = (params?.id as string) || "CLM-1001";
+  
+  // Local states
+  const [dbData, setDbData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [reviewReason, setReviewReason] = useState("");
+  const [submittingDecision, setSubmittingDecision] = useState(false);
+
+  // Fallback state
+  const { claims } = useTrustLens();
+  const fallbackClaim = claims.find((c) => c.id === claimId) || claims[0];
+
+  useEffect(() => {
+    async function fetchClaim() {
+      try {
+        const res = await fetch(apiUrl(`api/v1/claims/${claimId}`));
+        if (res.ok) {
+          const data = await res.json();
+          setDbData(data);
+        } else {
+          console.error("Failed to fetch claim from DB");
+        }
+      } catch (err) {
+        console.error("API error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchClaim();
+  }, [claimId]);
+
+  const handleReviewAction = async (action: string) => {
+    if (!reviewReason) {
+      alert("Please provide a reason for the audit log.");
+      return;
+    }
+    setSubmittingDecision(true);
+    try {
+      const res = await fetch(apiUrl(`api/v1/review-queue/${claimId}/action`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, notes: reviewReason })
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setDbData((prev: any) => ({ ...prev, status: updated.new_status, audit_logs: [{ action: `Review Decision: ${action}`, details: reviewReason, created_at: new Date().toISOString() }, ...(prev?.audit_logs || [])] }));
+        setReviewReason("");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmittingDecision(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="p-8 text-center text-[#6B7280] text-[13px] flex items-center justify-center h-screen"><RefreshCcw className="w-5 h-5 animate-spin mr-2" /> Loading workspace...</div>;
+  }
+
+  // Merge DB data with Fallback if DB data is missing
+  const activeData = dbData || {
+    id: fallbackClaim.id,
+    claim_number: fallbackClaim.id,
+    order_id: fallbackClaim.orderId,
+    amount: fallbackClaim.amount,
+    currency: "INR",
+    status: fallbackClaim.status,
+    risk_score: fallbackClaim.riskScore,
+    risk_level: fallbackClaim.riskLevel,
+    evidence: [{
+      file_name: fallbackClaim.evidenceFile,
+      sha256: fallbackClaim.evidenceHash || "a9f43b77e810...",
+      file_size: fallbackClaim.evidenceSize || "2.4 MB",
+      duplicate: fallbackClaim.duplicateMatch ? { similarity_score: fallbackClaim.duplicateMatch.similarity, matched_evidence_id: fallbackClaim.duplicateMatch.claimId } : null,
+      forensics: { manipulation_score: fallbackClaim.riskScore > 50 ? 80 : 10, details: {} }
+    }],
+    explanation: "Base risk applied due to high-value claim category. +25 points for identical hash collision.",
+    audit_logs: [
+      { action: "EVIDENCE_UPLOADED", details: "File received via mobile capture", created_at: new Date().toISOString() },
+      { action: "PIPELINE_START", details: "Initiating 9 forensic engines", created_at: new Date().toISOString() }
+    ]
+  };
+
+  const primaryEvidence = activeData.evidence?.[0] || {};
+  
+  let imageSrc = "/damage.jpg";
+  if (primaryEvidence.file_name) {
+    const fn = primaryEvidence.file_name;
+    imageSrc = fn.startsWith("http") || fn.startsWith("blob") ? fn : (fn.startsWith("/") ? fn : `/demo-evidence/${fn}`);
+  } else if (fallbackClaim.evidenceFile) {
+    const fn = fallbackClaim.evidenceFile;
+    imageSrc = fn.startsWith("http") || fn.startsWith("blob") ? fn : (fn.startsWith("/") ? fn : `/demo-evidence/${fn}`);
+  }
+
+  const isProcessing = activeData.status === "PENDING" || activeData.status === "UNDER_REVIEW";
+
+  return (
+    <div className="flex flex-col h-[calc(100vh-64px)] bg-white overflow-hidden text-[#111827]">
+      {/* Top Action Bar */}
+      <div className="h-14 border-b border-[#E5E7EB] flex items-center justify-between px-4 shrink-0 bg-white z-10">
+        <div className="flex items-center space-x-3">
+          <Link href="/dashboard/claims" className="text-[#6B7280] hover:text-[#111827] transition-colors text-[13px] font-medium flex items-center">
+            Claims
+          </Link>
+          <span className="text-[#D1D5DB]">/</span>
+          <span className="font-semibold text-[13px] bg-[#F3F4F6] px-2 py-1 rounded text-[#374151]">{activeData.claim_number}</span>
+          <span className="text-[13px] text-[#4B5563] ml-2 font-medium hidden sm:inline-block">Order: {activeData.order_id}</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="px-3 py-1 bg-white border border-[#E5E7EB] rounded-md text-[12px] font-medium text-[#4B5563]">
+            {activeData.status}
+          </span>
+          <span className={`flex items-center text-[12px] font-medium px-3 py-1 rounded-md ${
+            activeData.risk_level === 'CRITICAL' || activeData.risk_level === 'HIGH' ? 'bg-[#FEF2F2] text-[#DC2626] border border-[#FCA5A5]' : 
+            activeData.risk_level === 'MEDIUM' ? 'bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A]' : 'bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]'
+          }`}>
+            {activeData.risk_level === 'CRITICAL' || activeData.risk_level === 'HIGH' ? <AlertTriangle className="w-3.5 h-3.5 mr-1.5" /> : <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />}
+            {activeData.risk_level} RISK
+          </span>
+          <ExportMenu type="claim_detail" claimId={activeData.id} buttonLabel="Export Dossier" />
+        </div>
+      </div>
+
+      {/* 3-Pane Workspace */}
+      <div className="flex flex-1 overflow-hidden">
+        
+        {/* A. Left Evidence Navigation Panel */}
+        <div className="hidden lg:flex w-[260px] flex-col border-r border-[#E5E7EB] bg-[#F9FAFB] shrink-0">
+          <div className="p-3 border-b border-[#E5E7EB] flex items-center justify-between bg-white">
+            <span className="font-semibold text-[13px] text-[#374151]">Evidence Queue</span>
+            <button className="p-1.5 hover:bg-[#F3F4F6] rounded-md text-[#6B7280] transition-colors" title="Upload new evidence">
+              <Upload className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="overflow-y-auto flex-1 p-2 space-y-2">
+            {/* Primary Evidence */}
+            <div className="p-2 border border-[#2563EB] bg-[#EFF6FF] rounded-lg cursor-pointer flex gap-3 shadow-sm">
+              <div className="w-16 h-16 bg-[#E5E7EB] rounded overflow-hidden shrink-0 border border-[#BFDBFE]">
+                <img src={imageSrc} className="w-full h-full object-cover" alt="Thumb" />
+              </div>
+              <div className="flex flex-col justify-center overflow-hidden">
+                <span className="text-[12px] font-medium text-[#1E3A8A] truncate">{primaryEvidence.file_name || "evidence.jpg"}</span>
+                <span className="text-[10px] text-[#60A5FA] mt-1 uppercase tracking-wider font-semibold">Primary Check</span>
+              </div>
+            </div>
+            
+            {/* Context Actions */}
+            <div className="mt-6">
+              <h3 className="px-2 text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Claim Details</h3>
+              <div className="px-2 space-y-2 text-[12px] text-[#4B5563]">
+                <div className="flex justify-between"><span>Amount</span><span className="font-medium text-[#111827]">{activeData.currency} {activeData.amount}</span></div>
+                <div className="flex justify-between"><span>Type</span><span className="font-medium text-[#111827]">{activeData.claim_type}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* B. Center Evidence Viewer */}
+        <div className="flex-1 flex flex-col bg-[#F3F4F6] relative">
+          <div className="absolute top-4 left-4 z-10 flex space-x-1.5 bg-white/90 backdrop-blur border border-[#E5E7EB] rounded-md shadow-sm p-1">
+            <button className="p-1.5 hover:bg-[#F3F4F6] text-[#4B5563] rounded transition-colors"><ZoomIn className="w-4 h-4" /></button>
+            <button className="p-1.5 hover:bg-[#F3F4F6] text-[#4B5563] rounded transition-colors"><ZoomOut className="w-4 h-4" /></button>
+            <div className="w-[1px] h-4 bg-[#E5E7EB] self-center mx-1" />
+            <button className="p-1.5 hover:bg-[#F3F4F6] text-[#4B5563] rounded transition-colors"><Maximize className="w-4 h-4" /></button>
+          </div>
+          
+          <div className="flex-1 overflow-auto flex items-center justify-center p-6">
+            <div className="relative max-w-full max-h-full bg-white shadow-sm border border-[#E5E7EB]">
+              <img 
+                src={imageSrc} 
+                alt="Main Evidence Viewer" 
+                className="max-w-full max-h-[80vh] object-contain"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (!target.src.includes("/damage.jpg")) target.src = "/damage.jpg";
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* C. Right Analysis Inspector */}
+        <div className="w-[360px] flex-col border-l border-[#E5E7EB] bg-white shrink-0 overflow-y-auto hidden md:flex">
+          <div className="p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+            <h2 className="text-[14px] font-semibold text-[#111827]">Analysis Inspector</h2>
+            <p className="text-[11px] text-[#6B7280] mt-1">AI Pipeline Results & Workflow</p>
+          </div>
+
+          <InspectorSection title="Explainable Score Breakdown" icon={ShieldAlert} defaultOpen={true}>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[12px] font-medium text-[#111827]">Engine Output</span>
+                <span className="font-bold text-[18px] text-[#111827]">{activeData.risk_score}/100</span>
+              </div>
+              <div className="w-full h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden mb-2">
+                <div 
+                  className={`h-full ${activeData.risk_score > 60 ? 'bg-[#DC2626]' : activeData.risk_score > 30 ? 'bg-[#F59E0B]' : 'bg-[#10B981]'}`}
+                  style={{ width: `${activeData.risk_score}%` }}
+                />
+              </div>
+              <div className="p-2.5 bg-[#F9FAFB] border border-[#E5E7EB] rounded-md text-[11px] text-[#4B5563] leading-relaxed">
+                {activeData.explanation || "Risk calculation based on multiple algorithmic factors and heuristics."}
+              </div>
+            </div>
+          </InspectorSection>
+
+          <InspectorSection title="Evidence Integrity Verification" icon={Info} defaultOpen={true}>
+            <div className="space-y-2.5 text-[12px]">
+              <div className="flex justify-between items-center border-b border-[#E5E7EB] pb-2">
+                <span className="text-[#6B7280]">Hash Match</span>
+                <span className="flex items-center text-[#059669] font-medium bg-[#ECFDF5] px-2 py-0.5 rounded text-[10px]"><CheckCircle2 className="w-3 h-3 mr-1" /> Verified</span>
+              </div>
+              <div className="flex flex-col space-y-1">
+                <span className="text-[#6B7280] text-[11px]">Original Stored SHA-256</span>
+                <span className="font-mono text-[10px] font-medium text-[#111827] bg-[#F3F4F6] p-1.5 rounded truncate" title={primaryEvidence.sha256}>
+                  {primaryEvidence.sha256 || "e6f3b95489325da7..."}
+                </span>
+              </div>
+            </div>
+          </InspectorSection>
+
+          <InspectorSection title="Live Analysis Timeline" icon={Activity} defaultOpen={true}>
+            <div className="relative pl-3 border-l-2 border-[#E5E7EB] space-y-4 py-2 ml-2">
+              {(activeData.audit_logs || []).slice(0, 5).map((log: any, idx: number) => (
+                <div key={idx} className="relative">
+                  <div className="absolute -left-[21px] top-1 w-3 h-3 bg-white border-2 border-[#2563EB] rounded-full" />
+                  <div className="flex flex-col">
+                    <span className="text-[11px] font-medium text-[#111827]">{log.action.replace(/_/g, ' ')}</span>
+                    <span className="text-[10px] text-[#6B7280]">{new Date(log.created_at).toLocaleString()}</span>
+                    <span className="text-[11px] text-[#4B5563] mt-0.5 bg-[#F9FAFB] p-1.5 rounded border border-[#E5E7EB] inline-block">{log.details}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </InspectorSection>
+
+          <InspectorSection title="Human Review Workflow" icon={UserCheck} defaultOpen={true}>
+            <div className="space-y-3">
+              <div className="text-[12px] text-[#4B5563] mb-2">Record a persistent manual review decision for this claim.</div>
+              <textarea 
+                className="w-full text-[12px] p-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:border-[#2563EB] min-h-[60px]"
+                placeholder="Auditor notes & reason for decision..."
+                value={reviewReason}
+                onChange={(e) => setReviewReason(e.target.value)}
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <button 
+                  disabled={submittingDecision}
+                  onClick={() => handleReviewAction("APPROVED")}
+                  className="px-3 py-1.5 bg-white border border-[#E5E7EB] rounded text-[11px] font-medium hover:bg-[#ECFDF5] hover:text-[#059669] hover:border-[#A7F3D0] transition-colors"
+                >
+                  Approve Claim
+                </button>
+                <button 
+                  disabled={submittingDecision}
+                  onClick={() => handleReviewAction("REJECTED")}
+                  className="px-3 py-1.5 bg-white border border-[#E5E7EB] rounded text-[11px] font-medium hover:bg-[#FEF2F2] hover:text-[#DC2626] hover:border-[#FCA5A5] transition-colors"
+                >
+                  Reject Fraud
+                </button>
+                <button 
+                  disabled={submittingDecision}
+                  onClick={() => handleReviewAction("ESCALATED")}
+                  className="col-span-2 px-3 py-1.5 bg-[#F9FAFB] border border-[#E5E7EB] rounded text-[11px] font-medium hover:bg-[#E5E7EB] transition-colors"
+                >
+                  Escalate Case
+                </button>
+              </div>
+            </div>
+          </InspectorSection>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ClaimDetailPage() {
   return (
-    <Suspense fallback={
-      <div className="p-8 flex items-center justify-center font-mono text-[13px] font-bold">
-        Loading Claim Verification Dossier...
-      </div>
-    }>
+    <Suspense fallback={<div className="p-8 text-center text-[#6B7280] text-[13px] h-screen flex items-center justify-center">Loading workspace...</div>}>
       <ClaimDetailContent />
     </Suspense>
   );

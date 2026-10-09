@@ -36,26 +36,7 @@ export default function DashboardLayout({
 
   return (
     <TrustLensProvider>
-      <style dangerouslySetInnerHTML={{__html: `
-        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-        
-        .font-display { font-family: 'Archivo Black', sans-serif; }
-        .font-body { font-family: 'Space Grotesk', sans-serif; }
-        .font-mono { font-family: 'Space Mono', monospace; }
-        
-        .neo-shadow-sm { box-shadow: 3px 3px 0px #111111; }
-        .neo-shadow-md { box-shadow: 4px 4px 0px #111111; }
-        .neo-shadow-lg { box-shadow: 6px 6px 0px #111111; }
-        
-        .hover-neo-sm:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0px #111111; }
-        .hover-neo-md:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #111111; }
-        
-        .bg-grid {
-          background-image: linear-gradient(rgba(17,17,17,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(17,17,17,0.05) 1px, transparent 1px);
-          background-size: 24px 24px;
-        }
-      `}} />
-      <div className="flex h-screen w-full bg-[#fdf9f0] bg-grid text-[#111] font-body overflow-hidden relative">
+      <div className="flex h-screen w-full bg-[#F9FAFB] text-[#111827] font-sans overflow-hidden relative">
         
         {/* DESKTOP SIDEBAR (Untouched, visible on md: and above) */}
         <aside className="hidden md:flex w-[240px] h-screen bg-white border-r-2 border-[#111] shrink-0">
