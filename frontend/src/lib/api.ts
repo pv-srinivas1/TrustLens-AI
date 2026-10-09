@@ -1,5 +1,5 @@
 /**
- * TrustLens AI - Centralized API Resolution Helper
+ * TRUSTLENS TECHNOLOGIES - Centralized API Resolution Helper
  * 
  * Supports Vercel Services Routing & Bindings:
  * - In browser (client): relative URL "" directs requests to /api/... which Vercel rewrites to the 'backend' service.

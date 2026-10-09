@@ -30,12 +30,12 @@ export function Sidebar({ onNavigate, onClose, isMobile = false }: SidebarProps)
         >
           <img 
             src="/logo.png" 
-            alt="TrustLens AI" 
+            alt="TRUSTLENS TECHNOLOGIES" 
             className="w-10 h-10 object-contain transition-transform group-hover:scale-105"
           />
           <div className="flex flex-col">
             <h1 className="font-display text-[16px] text-[#111] tracking-tight leading-tight">
-              TRUSTLENS AI
+              TRUSTLENS TECHNOLOGIES
             </h1>
             <span className="font-mono text-[9px] font-bold text-[#111]/60">
               CONSOLE

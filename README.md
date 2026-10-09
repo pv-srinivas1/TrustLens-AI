@@ -1,10 +1,10 @@
-# TrustLens AI
+# TrustLens Technologies
 **AI-Powered Refund & Claim Verification Platform**
 
 *Verify the claim. Protect the refund. Trust the evidence.*
 
 ## Overview
-TrustLens AI is an AI-powered trust and safety platform designed to help digital commerce platforms verify customer refund, return, delivery and service claims.
+TrustLens Technologies is an AI-powered trust and safety platform designed to help digital commerce platforms verify customer refund, return, delivery and service claims.
 
 The system combines digital content provenance, image forensics, duplicate-evidence detection, behavioural analytics, order consistency and explainable risk scoring to determine how a claim should be handled.
 
@@ -29,7 +29,7 @@ A customer may submit a realistic-looking image as evidence of a damaged or miss
 Therefore, a platform should not rely on a single AI detector.
 
 ## Proposed Solution
-TrustLens AI uses multiple independent signals and combines them into an explainable claim-risk score.
+TrustLens Technologies uses multiple independent signals and combines them into an explainable claim-risk score.
 
 **Verification layers**
 - C2PA Content Credentials

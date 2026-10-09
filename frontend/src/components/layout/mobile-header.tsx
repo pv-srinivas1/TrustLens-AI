@@ -27,12 +27,12 @@ export function MobileHeader({ onMenuOpen, isOpen = false, pageTitle }: MobileHe
         <Link href="/dashboard" className="flex items-center space-x-2">
           <img 
             src="/logo.png" 
-            alt="TrustLens AI Logo" 
+            alt="TRUSTLENS TECHNOLOGIES Logo" 
             className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
           />
           <div className="flex flex-col">
             <span className="font-display text-[15px] sm:text-[16px] text-[#111] tracking-tight leading-none">
-              TrustLens AI
+              TRUSTLENS TECHNOLOGIES
             </span>
             {pageTitle && (
               <span className="font-mono text-[9px] text-[#737373] uppercase tracking-wider font-semibold">

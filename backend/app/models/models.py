@@ -191,6 +191,20 @@ class RiskScore(Base):
     
     claim = relationship("Claim", back_populates="detailed_risk_score")
 
+class ReviewCase(Base):
+    __tablename__ = "review_cases"
+    id = Column(String, primary_key=True, index=True)
+    claim_id = Column(String, ForeignKey("claims.id"), unique=True)
+    priority = Column(String, default="NORMAL") # NORMAL, URGENT, CRITICAL
+    status = Column(String, default="OPEN") # OPEN, IN_PROGRESS, RESOLVED, CLOSED
+    routing_reason = Column(String)
+    assigned_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    claim = relationship("Claim")
+    assignee = relationship("User")
+
 class ReviewAction(Base):
     __tablename__ = "review_actions"
     id = Column(Integer, primary_key=True, index=True)
@@ -233,3 +247,24 @@ class Webhook(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     organization = relationship("Organization", back_populates="webhooks")
+
+class ToolExecution(Base):
+    __tablename__ = "tool_executions"
+    id = Column(String, primary_key=True, index=True) # UUID or string ID
+    evidence_id = Column(String, ForeignKey("claim_evidence.id"))
+    claim_id = Column(String, ForeignKey("claims.id"))
+    tool_name = Column(String) # e.g., "ocr", "forensics", "provenance"
+    tool_version = Column(String, nullable=True)
+    status = Column(String) # QUEUED, RUNNING, COMPLETED, INCONCLUSIVE, UNAVAILABLE, FAILED
+    started_at = Column(DateTime(timezone=True), nullable=True)
+    finished_at = Column(DateTime(timezone=True), nullable=True)
+    duration_ms = Column(Integer, nullable=True)
+    attempt = Column(Integer, default=1)
+    error_code = Column(String, nullable=True)
+    error_message = Column(Text, nullable=True)
+    result_reference = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    evidence = relationship("ClaimEvidence")
+    claim = relationship("Claim")
+
