@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { 
@@ -61,6 +61,32 @@ function ClaimDetailContent() {
     }, 1200);
   };
 
+  // Processing Animation state
+  const isProcessing = claim.status === "PENDING" || claim.status === "UNDER_REVIEW";
+  const [progress, setProgress] = useState(isProcessing ? 0 : 100);
+
+  useEffect(() => {
+    if (isProcessing) {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            // Simulate backend finishing after 20 seconds
+            if (claim.status === "PENDING" || claim.status === "UNDER_REVIEW") {
+              updateClaimDecision(claim.id, "Escalated", "Automated AI Analysis Completed");
+            }
+            return 100;
+          }
+          const increment = prev > 85 ? 1 : prev > 50 ? 2 : 4;
+          return Math.min(prev + increment, 100);
+        });
+      }, 500);
+      return () => clearInterval(interval);
+    } else {
+      setProgress(100);
+    }
+  }, [isProcessing, claim.id, claim.status, updateClaimDecision]);
+
   return (
     <div className="space-y-6 pb-14">
       {/* Back Link */}
@@ -106,7 +132,13 @@ function ClaimDetailContent() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
-            <ExportMenu type="claim_detail" claimId={claim.id} buttonLabel="Export Dossier PDF" />
+            {progress < 100 ? (
+              <button disabled className="px-4 py-2.5 min-h-[44px] bg-[#111] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-white opacity-80 flex items-center justify-center">
+                <Clock className="w-4 h-4 mr-2 animate-spin" /> Analyzing AI Signals... {progress}%
+              </button>
+            ) : (
+              <ExportMenu type="claim_detail" claimId={claim.id} buttonLabel="Export Dossier PDF" />
+            )}
 
             <button 
               onClick={() => {
@@ -127,25 +159,42 @@ function ClaimDetailContent() {
           </div>
         </div>
 
-        {/* Risk Banner Badge */}
-        <div className="mt-5 pt-4 border-t-2 border-[#111]/10 flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center space-x-2">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full border-2 border-[#111] font-display text-[12px] tracking-wide ${
-              claim.riskLevel === 'CRITICAL' ? 'bg-[#c8a2ff]' :
-              claim.riskLevel === 'HIGH' ? 'bg-[#ff3d81]' : 
-              claim.riskLevel === 'MEDIUM' ? 'bg-[#ffd23f]' : 'bg-[#3ddc97]'
-            }`}>
-              <AlertTriangle className="w-3.5 h-3.5 mr-1.5" strokeWidth={3} />
-              {claim.riskLevel} VERIFICATION RISK ({claim.riskScore}/100)
-            </span>
-            <span className="text-[12px] font-mono font-bold text-[#111]/70">
-              STATUS: {claim.status.toUpperCase()}
-            </span>
-          </div>
+        {/* Risk Banner Badge or Loading Banner */}
+        <div className="mt-5 pt-4 border-t-2 border-[#111]/10 flex flex-col w-full gap-3">
+          {progress < 100 ? (
+            <div className="w-full">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-bold text-[13px] text-[#111]">AI Forensics Pipeline Running...</span>
+                <span className="font-bold text-[13px] text-[#111]">{progress}%</span>
+              </div>
+              <div className="w-full h-4 border-2 border-[#111] bg-white rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-[#ff3d81] transition-all duration-300 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between flex-wrap gap-2 w-full">
+              <div className="flex items-center space-x-2">
+                <span className={`inline-flex items-center px-3 py-1 rounded-full border-2 border-[#111] font-display text-[12px] tracking-wide ${
+                  claim.riskLevel === 'CRITICAL' ? 'bg-[#c8a2ff]' :
+                  claim.riskLevel === 'HIGH' ? 'bg-[#ff3d81]' : 
+                  claim.riskLevel === 'MEDIUM' ? 'bg-[#ffd23f]' : 'bg-[#3ddc97]'
+                }`}>
+                  <AlertTriangle className="w-3.5 h-3.5 mr-1.5" strokeWidth={3} />
+                  {claim.riskLevel} VERIFICATION RISK ({claim.riskScore}/100)
+                </span>
+                <span className="text-[12px] font-mono font-bold text-[#111]/70">
+                  STATUS: {claim.status.toUpperCase()}
+                </span>
+              </div>
 
-          {claim.duplicateMatch && (
-            <div className="flex items-center px-3 py-1 bg-[#ffd23f] border-2 border-[#111] rounded-md text-[11px] font-bold">
-              <span>⚠ {claim.duplicateMatch.similarity}% visual similarity to {claim.duplicateMatch.claimId}</span>
+              {claim.duplicateMatch && (
+                <div className="flex items-center px-3 py-1 bg-[#ffd23f] border-2 border-[#111] rounded-md text-[11px] font-bold">
+                  <span>⚠ {claim.duplicateMatch.similarity}% visual similarity to {claim.duplicateMatch.claimId}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
