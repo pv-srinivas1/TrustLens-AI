@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: trustlens-api
+    env: docker
+    repo: https://github.com/pv-srinivas1/TrustLens-AI
+    branch: main
+    dockerContext: ./backend
+    dockerCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: trustlens-redis
+          property: connectionString
+
+  - type: worker
+    name: trustlens-worker
+    env: docker
+    repo: https://github.com/pv-srinivas1/TrustLens-AI
+    branch: main
+    dockerContext: ./backend
+    dockerCommand: celery -A app.celery_app worker -l info --pool=solo
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: trustlens-redis
+          property: connectionString
+
+  - type: redis
+    name: trustlens-redis
+    plan: free
