@@ -414,10 +414,10 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     doc = SimpleDocTemplate(
         buffer,
         pagesize=A4,
-        leftMargin=30,
-        rightMargin=30,
-        topMargin=30,
-        bottomMargin=30
+        leftMargin=24,
+        rightMargin=24,
+        topMargin=24,
+        bottomMargin=24
     )
     styles = get_styles()
     story = []
@@ -461,17 +461,17 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#f8fafc")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
     ]))
     story.append(meta_table)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 1))
 
     # Description
     story.append(Paragraph("Customer Claim Statement", styles['SectionTitle']))
     desc_text = claim.description or "No customer description provided."
     story.append(Paragraph(f"<i>\"{desc_text}\"</i>", styles['CellText']))
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 1))
 
     # Verification Risk Section
     story.append(Paragraph("Verification Risk Assessment", styles['SectionTitle']))
@@ -498,11 +498,11 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
         ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
-        ('TOPPADDING', (0, 0), (-1, -1), 5),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
     ]))
     story.append(risk_meta_table)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 1))
 
     # Verification Pipeline Table (9 signals from specification)
     story.append(Paragraph("Multi-Engine Forensic Signal Breakdown", styles['SectionTitle']))
@@ -524,11 +524,11 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 1),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
     ]))
     story.append(sig_table)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 1))
 
     # Flowchart Visualizer
     story.append(Paragraph("AI Verification Pipeline Path", styles['SectionTitle']))
@@ -554,11 +554,11 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('TOPPADDING', (0, 0), (-1, -1), 8),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
     ]))
     story.append(flow_table)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 1))
 
     # Evidence & Image Section
     story.append(Paragraph("Uploaded Evidence Artifact", styles['SectionTitle']))
@@ -568,17 +568,17 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         [Paragraph("Evidence ID", styles['CellTextBold']), Paragraph(getattr(ev_item, "id", "EV-UNKNOWN"), styles['CellText'])],
         [Paragraph("File Name", styles['CellTextBold']), Paragraph(getattr(ev_item, "file_name", "damage.jpg"), styles['CellText'])],
         [Paragraph("File Size / Type", styles['CellTextBold']), Paragraph(f"{getattr(ev_item, 'file_size', 2480112) / 1024 / 1024:.1f} MB (JPEG)", styles['CellText'])],
-        [Paragraph("SHA-256 Hash", styles['CellTextBold']), Paragraph(getattr(ev_item, "sha256", "UNKNOWN"), styles['CellText'])],
+        [Paragraph("SHA-256 Hash", styles['CellTextBold']), Paragraph(f"{getattr(ev_item, 'sha256', 'UNKNOWN')[:8]}...****...{getattr(ev_item, 'sha256', 'UNKNOWN')[-8:]}", styles['CellText'])],
     ]
     ev_table = Table(ev_meta, colWidths=[120, 367])
     ev_table.setStyle(TableStyle([
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 1),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
     ]))
     story.append(ev_table)
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 1))
 
     # Try to securely embed the real image if it exists on disk or via URL
     embedded_img = False
@@ -602,19 +602,19 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
                 req = urllib.request.Request(path, headers={'User-Agent': 'Mozilla/5.0'})
                 with urllib.request.urlopen(req, timeout=5) as response:
                     img_data = response.read()
-                rl_img = RLImage(BytesIO(img_data), width=3.0 * inch, height=2.0 * inch)
+                rl_img = RLImage(BytesIO(img_data), width=2.0 * inch, height=1.3 * inch)
             except Exception as e:
                 print("Failed to download image URL for PDF:", e)
         elif isinstance(path, str) and os.path.exists(path) and os.path.isfile(path):
             try:
-                rl_img = RLImage(path, width=3.0 * inch, height=2.0 * inch)
+                rl_img = RLImage(path, width=2.0 * inch, height=1.3 * inch)
             except Exception:
                 pass
 
         if rl_img:
             story.append(KeepTogether([
                 Paragraph("<b>Real Uploaded Evidence Image:</b>", styles['MetaText']),
-                Spacer(1, 4),
+                Spacer(1, 2),
                 rl_img
             ]))
             embedded_img = True
@@ -623,7 +623,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     if not embedded_img:
         story.append(Paragraph("<i>[Evidence file stored securely in Supabase Storage - Thumbnail not available]</i>", styles['MetaText']))
 
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 1))
 
     # Audit Trail Table
     story.append(Paragraph("Compliance Audit Timeline", styles['SectionTitle']))
@@ -639,8 +639,8 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 1),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
     ]))
     story.append(audit_table)
 
