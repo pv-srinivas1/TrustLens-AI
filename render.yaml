@@ -42,3 +42,4 @@ services:
   - type: redis
     name: trustlens-redis
     plan: free
+    ipAllowList: []
