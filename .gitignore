@@ -36,3 +36,4 @@ backend/uploads/
 # Redis Binaries
 backend/Redis/
 backend/Redis.zip
+.vercel

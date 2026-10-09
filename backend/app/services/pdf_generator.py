@@ -164,7 +164,7 @@ def create_header(title: str, subtitle: str, org_name: str = "TrustLens Technolo
     left_cell = []
     if os.path.exists(logo_path):
         try:
-            logo_img = RLImage(logo_path, width=1.8 * inch, height=0.45 * inch)
+            logo_img = RLImage(logo_path, width=0.6 * inch, height=0.6 * inch)
             logo_img.hAlign = 'LEFT'
             left_cell.append(logo_img)
         except Exception:
@@ -234,7 +234,7 @@ def generate_overview_pdf(stats: dict, claims: list, date_range: str = "Last 7 d
     high_risk = stats.get("high_risk_claims", len([c for c in claims if (c.risk_level or "").upper() in ["HIGH", "CRITICAL"]]))
     under_review = stats.get("claims_under_review", len([c for c in claims if (c.status or "").upper() == "UNDER_REVIEW"]))
     verified = stats.get("evidence_verified", max(0, total - high_risk))
-    loss_prev = stats.get("potential_loss_prevented", "₹2.84L")
+    loss_prev = stats.get("potential_loss_prevented", "INR 2.84L")
 
     story.append(Paragraph("Executive Verification Metrics", styles['SectionTitle']))
     kpi_data = [
@@ -307,7 +307,7 @@ def generate_overview_pdf(stats: dict, claims: list, date_range: str = "Last 7 d
             table_rows.append([
                 Paragraph(c.claim_number or c.id, styles['CellTextBold']),
                 Paragraph(c.claim_type or "General", styles['CellText']),
-                Paragraph(f"₹{c.amount:,.2f}" if c.amount else "₹0.00", styles['CellText']),
+                Paragraph(f"INR {c.amount:,.2f}" if c.amount else "INR 0.00", styles['CellText']),
                 Paragraph(f"{r_level} ({int(c.risk_score or 0)})", badge),
                 Paragraph((c.status or "PENDING").replace("_", " "), styles['CellText']),
                 Paragraph((getattr(c, "source_type", "real_upload") or "real_upload").replace("_", " ").title(), styles['CellText'])
@@ -384,7 +384,7 @@ def generate_claims_pdf(claims: list, filters_applied: dict = None) -> bytes:
             Paragraph(c.claim_number or c.id, styles['CellTextBold']),
             Paragraph(getattr(c, "customer_id", "—"), styles['CellText']),
             Paragraph(c.claim_type or "—", styles['CellText']),
-            Paragraph(f"₹{c.amount:,.0f}" if c.amount else "₹0", styles['CellText']),
+            Paragraph(f"INR {c.amount:,.0f}" if c.amount else "INR 0", styles['CellText']),
             Paragraph(f"{r_level} ({int(c.risk_score or 0)})", badge),
             Paragraph((c.status or "PENDING").replace("_", " "), styles['CellText']),
             Paragraph((getattr(c, "source_type", "real_upload") or "real_upload").replace("_", " ").title(), styles['CellText']),
@@ -439,7 +439,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
             Paragraph("Claim Type", styles['CellTextBold']), Paragraph(claim.claim_type or "—", styles['CellText']),
         ],
         [
-            Paragraph("Claim Amount", styles['CellTextBold']), Paragraph(f"{claim.currency or 'INR'} {claim.amount:,.2f}" if claim.amount else "₹0.00", styles['CellTextBold']),
+            Paragraph("Claim Amount", styles['CellTextBold']), Paragraph(f"{claim.currency or 'INR'} {claim.amount:,.2f}" if claim.amount else "INR 0.00", styles['CellTextBold']),
             Paragraph("Current Status", styles['CellTextBold']), Paragraph((claim.status or "PENDING").replace("_", " "), styles['CellTextBold']),
         ],
         [
@@ -687,7 +687,7 @@ def generate_review_queue_pdf(claims: list) -> bytes:
         table_data.append([
             Paragraph(c.claim_number or c.id, styles['CellTextBold']),
             Paragraph(getattr(c, "customer_id", "—"), styles['CellText']),
-            Paragraph(f"₹{c.amount:,.0f}" if c.amount else "₹0", styles['CellText']),
+            Paragraph(f"INR {c.amount:,.0f}" if c.amount else "INR 0", styles['CellText']),
             Paragraph(f"{r_level} ({int(c.risk_score or 0)})", badge),
             Paragraph(c.description[:40] + "..." if c.description and len(c.description) > 40 else (c.description or "Forensics flag"), styles['CellText']),
             Paragraph("Alex R.", styles['CellText']),
