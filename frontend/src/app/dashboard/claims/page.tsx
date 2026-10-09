@@ -162,24 +162,24 @@ export default function ClaimsPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-2 pb-12">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-2">
         <div>
-          <h1 className="font-display text-[24px] sm:text-[28px] text-[#111] uppercase tracking-tight">Claims</h1>
+          <h1 className="font-display text-[16px] sm:text-[28px] text-[#111] uppercase tracking-tight">Claims</h1>
           <p className="text-[13px] sm:text-[14px] text-[#111]/70 font-medium">Review and investigate customer claims.</p>
         </div>
 
         <button 
           onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center justify-center px-4 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform shrink-0 w-full sm:w-auto"
+          className="flex items-center justify-center px-4 py-2.5 min-h-[32px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform shrink-0 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4 mr-1.5" strokeWidth={3} /> + Create Claim
         </button>
       </div>
 
       {/* Control Bar: Search, Source Filter [All] [Real] [Demo], Sort, Export */}
-      <div className="bg-white border-2 border-[#111] rounded-[14px] p-3 sm:p-4 neo-shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="bg-white border-2 border-[#111] rounded-[14px] p-3 sm:p-2 neo-shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-3 w-4 h-4 text-[#111]" strokeWidth={2.5} />
           <input 
@@ -187,7 +187,7 @@ export default function ClaimsPage() {
             placeholder="Search claims, order IDs, customers..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] text-[#111] placeholder:text-[#111]/50 focus:outline-none focus:bg-white"
+            className="w-full pl-10 pr-4 py-2 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] text-[#111] placeholder:text-[#111]/50 focus:outline-none focus:bg-white"
           />
         </div>
 
@@ -214,7 +214,7 @@ export default function ClaimsPage() {
           <div className="relative">
             <button 
               onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-              className={`flex items-center px-3 py-2 min-h-[44px] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform ${
+              className={`flex items-center px-3 py-2 min-h-[32px] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform ${
                 filterPlatform !== "ALL" || filterRisk !== "ALL" ? "bg-[#ffd23f]" : "bg-white"
               }`}
             >
@@ -266,7 +266,7 @@ export default function ClaimsPage() {
 
           <button 
             onClick={() => setFilterRisk(filterRisk === "ALL" ? "HIGH" : "ALL")}
-            className="flex items-center px-3 py-2 min-h-[44px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+            className="flex items-center px-3 py-2 min-h-[32px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
           >
             <ArrowDownUp className="w-3.5 h-3.5 mr-1.5" strokeWidth={2.5} /> Sort
           </button>
@@ -285,7 +285,7 @@ export default function ClaimsPage() {
       </div>
 
       {/* Main Table */}
-      <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-3 sm:p-6 neo-shadow-md w-full overflow-x-auto">
+      <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-3 sm:p-2 neo-shadow-md w-full overflow-x-auto">
         {filteredClaims.length === 0 ? (
           <div className="py-16 text-center">
             <p className="font-bold text-[16px] text-[#111]">No claims found.</p>
@@ -372,10 +372,10 @@ export default function ClaimsPage() {
 
       {/* CREATE CLAIM MODAL WITH REAL UPLOAD / CAMERA / DEMO SCENARIOS */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-2 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-2xl bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col max-h-[90vh] overflow-hidden">
             
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b-2 border-[#111] bg-[#fdf9f0]">
+            <div className="flex items-center justify-between p-2 sm:p-2 border-b-2 border-[#111] bg-[#fdf9f0]">
               <div className="pr-2">
                 <h2 className="font-display text-[18px] sm:text-[22px] uppercase text-[#111] leading-tight">Create Claim</h2>
                 <p className="text-[11px] sm:text-[12px] text-[#111]/70 font-medium">Enter claim metadata and provide supporting customer evidence.</p>
@@ -389,7 +389,7 @@ export default function ClaimsPage() {
               </button>
             </div>
 
-            <form onSubmit={handleCreateSubmit} className="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5">
+            <form onSubmit={handleCreateSubmit} className="p-2 sm:p-2 overflow-y-auto space-y-1 sm:space-y-5">
               {createdNotice && (
                 <div className="p-3 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] flex items-center text-[13px] font-bold">
                   <CheckCircle2 className="w-5 h-5 mr-2 shrink-0" />
@@ -404,7 +404,7 @@ export default function ClaimsPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-2">
                 <div className="space-y-1.5">
                   <label className="font-bold text-[12px] uppercase tracking-wide text-[#111]">Customer</label>
                   <input 
@@ -413,7 +413,7 @@ export default function ClaimsPage() {
                     onChange={(e) => setCustomer(e.target.value)}
                     required
                     placeholder="e.g. Customer #821" 
-                    className="w-full px-3.5 py-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm" 
+                    className="w-full px-3.5 py-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm" 
                   />
                 </div>
 
@@ -425,7 +425,7 @@ export default function ClaimsPage() {
                     onChange={(e) => setOrderId(e.target.value)}
                     required
                     placeholder="e.g. ORD-98231" 
-                    className="w-full px-3.5 py-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm" 
+                    className="w-full px-3.5 py-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm" 
                   />
                 </div>
 
@@ -434,7 +434,7 @@ export default function ClaimsPage() {
                   <select 
                     value={platform}
                     onChange={(e) => setPlatform(e.target.value)}
-                    className="w-full px-3.5 py-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm"
+                    className="w-full px-3.5 py-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm"
                   >
                     <option value="Food Delivery">Food Delivery</option>
                     <option value="E-Commerce">E-Commerce</option>
@@ -448,7 +448,7 @@ export default function ClaimsPage() {
                   <select 
                     value={claimType}
                     onChange={(e) => setClaimType(e.target.value)}
-                    className="w-full px-3.5 py-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm"
+                    className="w-full px-3.5 py-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm"
                   >
                     <option value="Damaged Product">Damaged Product</option>
                     <option value="Missing Item">Missing Item</option>
@@ -468,7 +468,7 @@ export default function ClaimsPage() {
                       onChange={(e) => setAmount(e.target.value)}
                       required
                       placeholder="749" 
-                      className="w-full pl-8 pr-3 py-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono font-bold text-[13px] focus:outline-none focus:bg-white neo-shadow-sm" 
+                      className="w-full pl-8 pr-3 py-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono font-bold text-[13px] focus:outline-none focus:bg-white neo-shadow-sm" 
                     />
                   </div>
                 </div>
@@ -478,7 +478,7 @@ export default function ClaimsPage() {
                   <select 
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full px-3.5 py-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm"
+                    className="w-full px-3.5 py-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white neo-shadow-sm"
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>
@@ -509,14 +509,14 @@ export default function ClaimsPage() {
                 <button 
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
+                  className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto px-6 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform disabled:opacity-50"
+                  className="w-full sm:w-auto px-6 py-2.5 min-h-[32px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform disabled:opacity-50"
                 >
                   {isSubmitting ? "Creating & Triaging..." : "Create Claim & Verify"}
                 </button>

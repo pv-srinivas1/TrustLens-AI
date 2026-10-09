@@ -33,11 +33,11 @@ export default function DashboardOverview() {
   const priorityClaims = claims.filter(c => c.riskLevel === "HIGH" || c.riskLevel === "CRITICAL").slice(0, 4);
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-2 pb-12">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-2">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 pt-2">
         <div>
-          <h1 className="text-[24px] sm:text-[28px] font-display uppercase tracking-tight text-[#111]">
+          <h1 className="text-[16px] sm:text-[28px] font-display uppercase tracking-tight text-[#111]">
             Overview
           </h1>
           <p className="text-[13px] sm:text-[14px] text-[#111]/70 font-medium">
@@ -46,7 +46,7 @@ export default function DashboardOverview() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <button className="flex items-center px-3.5 py-2 min-h-[44px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-semibold text-[13px] hover-neo-sm transition-transform">
+          <button className="flex items-center px-3.5 py-2 min-h-[32px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-semibold text-[13px] hover-neo-sm transition-transform">
             {dateRange} <ChevronDown className="w-4 h-4 ml-2" strokeWidth={2.5} />
           </button>
           
@@ -54,7 +54,7 @@ export default function DashboardOverview() {
 
           <Link
             href="/dashboard/claims"
-            className="flex items-center px-4 py-2 min-h-[44px] bg-[#ff3d81] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
+            className="flex items-center px-4 py-2 min-h-[32px] bg-[#ff3d81] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
           >
             <Plus className="w-4 h-4 mr-1.5" strokeWidth={3} /> Create Claim
           </Link>
@@ -72,7 +72,7 @@ export default function DashboardOverview() {
         ].map((item, idx) => (
           <div 
             key={idx}
-            className="bg-white border-2 border-[#111] rounded-[14px] p-4 neo-shadow-sm flex flex-col justify-between hover-neo-sm transition-transform"
+            className="bg-white border-2 border-[#111] rounded-[14px] p-2 neo-shadow-sm flex flex-col justify-between hover-neo-sm transition-transform"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-[12px] font-bold uppercase tracking-wider text-[#111]/70">
@@ -96,10 +96,10 @@ export default function DashboardOverview() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
         {/* Claim Activity Chart (2 cols) */}
-        <div className="lg:col-span-2 bg-white border-2 border-[#111] rounded-[16px] p-4 sm:p-6 neo-shadow-md">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-5">
+        <div className="lg:col-span-2 bg-white border-2 border-[#111] rounded-[16px] p-2 sm:p-2 neo-shadow-md">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-2 mb-1">
             <div>
               <h2 className="font-bold text-[15px] sm:text-[16px] text-[#111] flex items-center">
                 <TrendingUp className="w-4 h-4 mr-2 shrink-0" strokeWidth={2.5} />
@@ -154,12 +154,12 @@ export default function DashboardOverview() {
         </div>
 
         {/* Risk Distribution Breakdown (1 col) */}
-        <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md flex flex-col justify-between">
+        <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md flex flex-col justify-between">
           <div>
             <h2 className="font-bold text-[16px] text-[#111] mb-1">Risk Distribution</h2>
-            <p className="text-[12px] text-[#111]/60 font-medium mb-6">Aggregate risk bands across all evidence</p>
+            <p className="text-[12px] text-[#111]/60 font-medium mb-2">Aggregate risk bands across all evidence</p>
 
-            <div className="space-y-4">
+            <div className="space-y-1">
               {[
                 { band: "LOW", count: 924, pct: 72, color: "bg-[#3ddc97]" },
                 { band: "MEDIUM", count: 205, pct: 16, color: "bg-[#ffd23f]" },
@@ -190,7 +190,7 @@ export default function DashboardOverview() {
       </div>
 
       {/* Priority Review Table */}
-      <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md">
+      <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="font-bold text-[18px] text-[#111] flex items-center">

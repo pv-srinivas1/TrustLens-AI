@@ -49,11 +49,11 @@ export default function RiskAnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"signals" | "matrix">("signals");
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-2 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-2">
         <div>
-          <h1 className="font-display text-[24px] sm:text-[28px] text-[#111] uppercase tracking-tight flex items-center">
+          <h1 className="font-display text-[16px] sm:text-[28px] text-[#111] uppercase tracking-tight flex items-center">
             <ShieldAlert className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
             Risk Analytics &amp; Intelligence
           </h1>
@@ -67,7 +67,7 @@ export default function RiskAnalyticsPage() {
           <div className="relative">
             <button 
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="flex items-center px-3.5 py-2 min-h-[44px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-semibold text-[13px] hover-neo-sm transition-transform"
+              className="flex items-center px-3.5 py-2 min-h-[32px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-semibold text-[13px] hover-neo-sm transition-transform"
             >
               {timeRange === "7d" ? "Last 7 days" : timeRange === "30d" ? "Last 30 days" : "Last 90 days"}
               <ChevronDown className="w-4 h-4 ml-2" strokeWidth={2.5} />
@@ -109,7 +109,7 @@ export default function RiskAnalyticsPage() {
           { label: "Auto-Triage Rate", value: "88.6%", sub: "Zero human friction", color: "bg-[#3ddc97]", badge: "⚡ 420ms avg" },
           { label: "Prevented Loss", value: "₹18.4L", sub: "Saved this month", color: "bg-white", badge: "ROI 14.2x" },
         ].map((stat, i) => (
-          <div key={i} className="bg-white border-2 border-[#111] rounded-[14px] p-4 neo-shadow-sm hover-neo-sm transition-transform">
+          <div key={i} className="bg-white border-2 border-[#111] rounded-[14px] p-2 neo-shadow-sm hover-neo-sm transition-transform">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#111]/70">{stat.label}</span>
               <div className={`w-2.5 h-2.5 rounded-full border border-[#111] ${stat.color}`} />
@@ -128,10 +128,10 @@ export default function RiskAnalyticsPage() {
       </div>
 
       {/* Main Charts & Deep Analytics Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
         
         {/* Interactive Risk Score Trend (7 cols) */}
-        <div className="lg:col-span-7 bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md flex flex-col justify-between">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
               <div>
@@ -276,7 +276,7 @@ export default function RiskAnalyticsPage() {
         </div>
 
         {/* Risk Distribution Breakdown (5 cols) */}
-        <div className="lg:col-span-5 bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
               <h2 className="font-bold text-[17px] text-[#111]">Risk Distribution Bands</h2>
@@ -284,7 +284,7 @@ export default function RiskAnalyticsPage() {
                 1,284 CLAIMS
               </span>
             </div>
-            <p className="text-[12px] text-[#111]/60 font-medium mb-5">
+            <p className="text-[12px] text-[#111]/60 font-medium mb-1">
               Automated categorization across all evidence ingested
             </p>
 
@@ -325,10 +325,10 @@ export default function RiskAnalyticsPage() {
       </div>
 
       {/* Forensic Verification Signals & Claim Categories */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
         
         {/* Left Column: Verification Signals Breakdown (7 cols) */}
-        <div className="lg:col-span-7 bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md">
+        <div className="lg:col-span-7 bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="font-bold text-[18px] text-[#111] flex items-center">
@@ -371,7 +371,7 @@ export default function RiskAnalyticsPage() {
         </div>
 
         {/* Right Column: Claim Categories by Vulnerability (5 cols) */}
-        <div className="lg:col-span-5 bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -413,7 +413,7 @@ export default function RiskAnalyticsPage() {
       </div>
 
       {/* Forensic Detection Layers Performance Matrix (New Informative Table) */}
-      <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-3 sm:p-6 neo-shadow-md space-y-4">
+      <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-3 sm:p-2 neo-shadow-md space-y-1">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 className="font-bold text-[16px] sm:text-[18px] text-[#111] flex items-center">

@@ -205,11 +205,11 @@ function SettingsContent() {
   };
 
   return (
-    <div className="space-y-6 pb-14">
+    <div className="space-y-2 pb-2">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-2">
         <div>
-          <h1 className="font-display text-[24px] sm:text-[28px] text-[#111] uppercase tracking-tight flex items-center">
+          <h1 className="font-display text-[16px] sm:text-[28px] text-[#111] uppercase tracking-tight flex items-center">
             <Settings className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
             Settings &amp; Administration
           </h1>
@@ -243,7 +243,7 @@ function SettingsContent() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center px-3.5 py-2 min-h-[44px] rounded-[10px] border-2 border-[#111] font-bold text-[12px] whitespace-nowrap transition-transform shrink-0 ${
+            className={`flex items-center px-3.5 py-2 min-h-[32px] rounded-[10px] border-2 border-[#111] font-bold text-[12px] whitespace-nowrap transition-transform shrink-0 ${
               activeTab === tab.id
                 ? "bg-[#ff3d81] text-[#111] neo-shadow-sm"
                 : "bg-white text-[#111] hover:bg-[#fdf9f0]"
@@ -257,20 +257,20 @@ function SettingsContent() {
 
       {/* TAB CONTENT: 1. General */}
       {activeTab === "General" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-4xl space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md max-w-4xl space-y-5">
           <div className="flex items-center justify-between">
             <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">General Configuration</h2>
             <span className="text-[11px] font-mono text-[#111]/60 font-bold">WORKSPACE DEFAULTS</span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="space-y-1.5">
               <label className="font-bold text-[12px] uppercase tracking-wide">Organization Name</label>
               <input 
                 type="text" 
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
-                className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white" 
+                className="w-full p-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white" 
               />
             </div>
 
@@ -280,7 +280,7 @@ function SettingsContent() {
                 type="text" 
                 disabled
                 value={orgId}
-                className="w-full p-2.5 min-h-[44px] bg-[#eee] border-2 border-[#111] rounded-[10px] font-mono text-[13px] text-[#111]/60" 
+                className="w-full p-2.5 min-h-[32px] bg-[#eee] border-2 border-[#111] rounded-[10px] font-mono text-[13px] text-[#111]/60" 
               />
             </div>
 
@@ -289,7 +289,7 @@ function SettingsContent() {
               <select 
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
+                className="w-full p-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
               >
                 <option value="Asia/Kolkata (IST +05:30)">Asia/Kolkata (IST +05:30)</option>
                 <option value="America/New_York (EST -05:00)">America/New_York (EST -05:00)</option>
@@ -303,7 +303,7 @@ function SettingsContent() {
               <select 
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
+                className="w-full p-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] focus:outline-none focus:bg-white"
               >
                 <option value="INR (₹)">INR (₹)</option>
                 <option value="USD ($)">USD ($)</option>
@@ -316,7 +316,7 @@ function SettingsContent() {
           <div className="pt-2 border-t-2 border-[#111]/10 flex items-center justify-between flex-wrap gap-3">
             <button
               onClick={() => triggerSaveNotice("General settings saved successfully.")}
-              className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
+              className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
             >
               Save Changes
             </button>
@@ -339,7 +339,7 @@ function SettingsContent() {
                 type="button"
                 disabled={isResettingDemo}
                 onClick={handleResetDemo}
-                className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-[#ff6b5e] text-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2.5 min-h-[32px] bg-[#ff6b5e] text-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform disabled:opacity-50"
               >
                 {isResettingDemo ? "Purging Demo Records..." : "Reset Demo Data"}
               </button>
@@ -355,7 +355,7 @@ function SettingsContent() {
 
       {/* TAB CONTENT: CUSTOMERS & RECIDIVISM INTELLIGENCE */}
       {activeTab === "Customers" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md space-y-5">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111] flex items-center">
@@ -425,13 +425,13 @@ function SettingsContent() {
 
       {/* TAB CONTENT: 2. Organization */}
       {activeTab === "Organization" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-4xl space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md max-w-4xl space-y-5">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Team Members &amp; Access Controls</h2>
               <p className="text-[12px] text-[#111]/60 font-medium">Manage reviewer roles, permissions, and audit assignments.</p>
             </div>
-            <button className="w-full sm:w-auto px-4 py-2 min-h-[44px] bg-[#ffd23f] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform">
+            <button className="w-full sm:w-auto px-4 py-2 min-h-[32px] bg-[#ffd23f] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform">
               + Invite Member
             </button>
           </div>
@@ -467,7 +467,7 @@ function SettingsContent() {
 
       {/* TAB CONTENT: 3. Risk Engine */}
       {activeTab === "Risk Engine" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-2xl space-y-6">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md max-w-2xl space-y-2">
           <div>
             <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Risk Configuration</h2>
             <p className="text-[12px] text-[#111]/60 font-medium">
@@ -475,7 +475,7 @@ function SettingsContent() {
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-1">
             {[
               { label: "Provenance Signal", value: provenanceWeight, set: setProvenanceWeight, desc: "C2PA, SynthID, and capture hardware metadata validation" },
               { label: "Forensics Signal", value: forensicsWeight, set: setForensicsWeight, desc: "Error level analysis, cloned pixels, and compression edge checks" },
@@ -511,7 +511,7 @@ function SettingsContent() {
             </span>
             <button
               onClick={() => triggerSaveNotice("Risk Engine weights calibrated and saved.")}
-              className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#ffd23f] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
+              className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-[#ffd23f] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
             >
               Save Configuration
             </button>
@@ -521,7 +521,7 @@ function SettingsContent() {
 
       {/* TAB CONTENT: 4. Evidence */}
       {activeTab === "Evidence" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-2xl space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md max-w-2xl space-y-5">
           <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Evidence Ingestion Rules</h2>
           <div className="space-y-3 text-[13px]">
             <div className="p-3 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] flex justify-between items-center">
@@ -548,7 +548,7 @@ function SettingsContent() {
           </div>
           <button 
             onClick={() => triggerSaveNotice("Evidence rules updated.")}
-            className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px]"
+            className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px]"
           >
             Save Rules
           </button>
@@ -557,7 +557,7 @@ function SettingsContent() {
 
       {/* TAB CONTENT: 5. Notifications */}
       {activeTab === "Notifications" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-2xl space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md max-w-2xl space-y-5">
           <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Alerts &amp; Escalations</h2>
           <div className="space-y-3 text-[13px]">
             {[
@@ -576,7 +576,7 @@ function SettingsContent() {
           </div>
           <button 
             onClick={() => triggerSaveNotice("Notification channels saved.")}
-            className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px]"
+            className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px]"
           >
             Save Preferences
           </button>
@@ -585,7 +585,7 @@ function SettingsContent() {
 
       {/* TAB CONTENT: 6. Security */}
       {activeTab === "Security" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md max-w-2xl space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md max-w-2xl space-y-5">
           <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Security &amp; Governance</h2>
           <div className="space-y-3 text-[13px]">
             <div className="p-3 bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] flex justify-between items-center">
@@ -608,7 +608,7 @@ function SettingsContent() {
 
       {/* TAB CONTENT: 7. API Keys */}
       {activeTab === "API" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md space-y-5">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">API Keys</h2>
@@ -616,7 +616,7 @@ function SettingsContent() {
             </div>
             <button 
               onClick={() => { setGeneratedSecret(null); setNewKeyName(""); setIsApiKeyModalOpen(true); }}
-              className="w-full sm:w-auto flex items-center justify-center px-4 py-2 min-h-[44px] bg-[#ffd23f] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
+              className="w-full sm:w-auto flex items-center justify-center px-4 py-2 min-h-[32px] bg-[#ffd23f] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
             >
               <Plus className="w-4 h-4 mr-1.5" strokeWidth={3} /> + Create API Key
             </button>
@@ -663,8 +663,8 @@ function SettingsContent() {
 
           {/* Create API Key Modal */}
           {isApiKeyModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
-              <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-md bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-2 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+              <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-md bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg p-2 sm:p-2 space-y-1 max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center border-b-2 border-[#111] pb-3">
                   <h3 className="font-display text-[17px] sm:text-[18px] uppercase">
                     {generatedSecret ? "API Key Created" : "Create API Key"}
@@ -679,7 +679,7 @@ function SettingsContent() {
                 </div>
 
                 {!generatedSecret ? (
-                  <form onSubmit={handleCreateApiKey} className="space-y-4">
+                  <form onSubmit={handleCreateApiKey} className="space-y-1">
                     <div className="space-y-1.5">
                       <label className="font-bold text-[12px] uppercase">Key Name</label>
                       <input 
@@ -688,20 +688,20 @@ function SettingsContent() {
                         value={newKeyName}
                         onChange={(e) => setNewKeyName(e.target.value)}
                         placeholder="e.g. FastAPI Ingestion Worker"
-                        className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px]"
+                        className="w-full p-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px]"
                       />
                     </div>
                     <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2 items-stretch sm:items-center justify-end">
                       <button 
                         type="button" 
                         onClick={() => setIsApiKeyModalOpen(false)} 
-                        className="w-full sm:w-auto px-4 py-2 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
+                        className="w-full sm:w-auto px-4 py-2 min-h-[32px] bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
                       >
                         Cancel
                       </button>
                       <button 
                         type="submit" 
-                        className="w-full sm:w-auto px-4 py-2 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
+                        className="w-full sm:w-auto px-4 py-2 min-h-[32px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
                       >
                         Generate Secret
                       </button>
@@ -723,7 +723,7 @@ function SettingsContent() {
                     </div>
                     <button 
                       onClick={() => setIsApiKeyModalOpen(false)} 
-                      className="w-full py-2.5 min-h-[44px] bg-[#ff3d81] border-2 border-[#111] rounded-[10px] font-bold text-[12px]"
+                      className="w-full py-2.5 min-h-[32px] bg-[#ff3d81] border-2 border-[#111] rounded-[10px] font-bold text-[12px]"
                     >
                       I Have Saved This Key
                     </button>
@@ -737,7 +737,7 @@ function SettingsContent() {
 
       {/* TAB CONTENT: 8. Webhooks */}
       {activeTab === "Webhooks" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md space-y-5">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Outbound Webhooks</h2>
@@ -745,7 +745,7 @@ function SettingsContent() {
             </div>
             <button 
               onClick={() => setIsWebhookModalOpen(true)}
-              className="w-full sm:w-auto flex items-center justify-center px-4 py-2 min-h-[44px] bg-[#c8a2ff] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
+              className="w-full sm:w-auto flex items-center justify-center px-4 py-2 min-h-[32px] bg-[#c8a2ff] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] hover-neo-sm transition-transform"
             >
               <Plus className="w-4 h-4 mr-1.5" strokeWidth={3} /> + Add Webhook
             </button>
@@ -788,8 +788,8 @@ function SettingsContent() {
 
           {/* Add Webhook Modal */}
           {isWebhookModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
-              <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-lg bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-2 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+              <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-lg bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg p-2 sm:p-2 space-y-1 max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center border-b-2 border-[#111] pb-3">
                   <h3 className="font-display text-[17px] sm:text-[18px] uppercase">Add Webhook Endpoint</h3>
                   <button 
@@ -801,7 +801,7 @@ function SettingsContent() {
                   </button>
                 </div>
 
-                <form onSubmit={handleAddWebhook} className="space-y-4">
+                <form onSubmit={handleAddWebhook} className="space-y-1">
                   <div className="space-y-1.5">
                     <label className="font-bold text-[12px] uppercase">Endpoint URL</label>
                     <input 
@@ -810,7 +810,7 @@ function SettingsContent() {
                       value={newEndpoint}
                       onChange={(e) => setNewEndpoint(e.target.value)}
                       placeholder="https://api.yourdomain.com/webhooks/trustlens"
-                      className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px] font-mono"
+                      className="w-full p-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] text-[13px] font-mono"
                     />
                   </div>
 
@@ -824,7 +824,7 @@ function SettingsContent() {
                         "risk.calculated", 
                         "review.completed"
                       ].map((ev) => (
-                        <label key={ev} className="flex items-center space-x-2 p-2.5 min-h-[44px] bg-[#fdf9f0] border border-[#111] rounded-[8px] cursor-pointer">
+                        <label key={ev} className="flex items-center space-x-2 p-2.5 min-h-[32px] bg-[#fdf9f0] border border-[#111] rounded-[8px] cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={selectedEvents.includes(ev)} 
@@ -841,13 +841,13 @@ function SettingsContent() {
                     <button 
                       type="button" 
                       onClick={() => setIsWebhookModalOpen(false)} 
-                      className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
+                      className="w-full sm:w-auto px-4 py-2.5 min-h-[32px] bg-white border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit" 
-                      className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
+                      className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] font-bold text-[12px]"
                     >
                       Register Webhook
                     </button>
@@ -861,7 +861,7 @@ function SettingsContent() {
 
       {/* TAB CONTENT: 9. Audit Logs */}
       {activeTab === "Audit Logs" && (
-        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-4 sm:p-6 neo-shadow-md space-y-5">
+        <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-2 sm:p-2 neo-shadow-md space-y-5">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h2 className="font-bold text-[17px] sm:text-[18px] text-[#111]">Compliance &amp; Audit Logs</h2>

@@ -88,7 +88,7 @@ function ClaimDetailContent() {
   }, [isProcessing, claim.id, claim.status, updateClaimDecision]);
 
   return (
-    <div className="space-y-6 pb-14">
+    <div className="space-y-2 pb-2">
       {/* Back Link */}
       <div>
         <Link 
@@ -100,8 +100,8 @@ function ClaimDetailContent() {
       </div>
 
       {/* Header Banner */}
-      <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
           <div className="space-y-2">
             <div className="flex items-center space-x-3 flex-wrap">
               <span className="font-mono text-[14px] font-bold bg-[#ffd23f] border-2 border-[#111] px-2.5 py-0.5 rounded-md neo-shadow-sm">
@@ -112,7 +112,7 @@ function ClaimDetailContent() {
                   DEMO CLAIM
                 </span>
               )}
-              <h1 className="font-display text-[24px] uppercase text-[#111] leading-none">
+              <h1 className="font-display text-[16px] uppercase text-[#111] leading-none">
                 {claim.type}
               </h1>
               <span className="font-mono font-bold text-[20px] text-[#111]">
@@ -120,7 +120,7 @@ function ClaimDetailContent() {
               </span>
             </div>
 
-            <div className="flex items-center gap-4 text-[13px] font-medium text-[#111]/70 flex-wrap">
+            <div className="flex items-center gap-2 text-[13px] font-medium text-[#111]/70 flex-wrap">
               <span className="flex items-center"><User className="w-3.5 h-3.5 mr-1" /> {claim.customer}</span>
               <span>•</span>
               <span className="flex items-center"><ShoppingBag className="w-3.5 h-3.5 mr-1" /> Order: <strong className="text-[#111] ml-1">{claim.orderId}</strong></span>
@@ -133,34 +133,17 @@ function ClaimDetailContent() {
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
             {progress < 100 ? (
-              <button disabled className="px-4 py-2.5 min-h-[44px] bg-[#111] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-white opacity-80 flex items-center justify-center">
-                <Clock className="w-4 h-4 mr-2 animate-spin" /> Analyzing AI Signals... {progress}%
+              <button disabled className="px-4 py-1.5 min-h-[36px] bg-[#111] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-white opacity-80 flex items-center justify-center">
+                <Clock className="w-4 h-4 mr-2 animate-spin" /> Analyzing... {progress}%
               </button>
             ) : (
-              <ExportMenu type="claim_detail" claimId={claim.id} buttonLabel="Export Dossier PDF" />
+              <ExportMenu type="claim_detail" claimId={claim.id} buttonLabel="Export PDF" />
             )}
-
-            <button 
-              onClick={() => {
-                setSelectedDecision("Awaiting Evidence");
-                setDecisionReason("Please provide an unedited photo showing the package label alongside the affected item.");
-                setIsReviewModalOpen(true);
-              }}
-              className="px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform text-center"
-            >
-              Request More Evidence
-            </button>
-            <button 
-              onClick={() => setIsReviewModalOpen(true)}
-              className="px-5 py-2.5 min-h-[44px] bg-[#ff3d81] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform text-center"
-            >
-              Open Review
-            </button>
           </div>
         </div>
 
         {/* Risk Banner Badge or Loading Banner */}
-        <div className="mt-5 pt-4 border-t-2 border-[#111]/10 flex flex-col w-full gap-3">
+        <div className="mt-2 pt-2 border-t-2 border-[#111]/10 flex flex-col w-full gap-1">
           {progress < 100 ? (
             <div className="w-full">
               <div className="flex justify-between items-center mb-2">
@@ -201,11 +184,11 @@ function ClaimDetailContent() {
       </div>
 
       {/* Main Grid: Evidence on Left (5/12), Verification & Risk on Right (7/12) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
         
         {/* Left Column: Uploaded Evidence (5 cols) */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white border-2 border-[#111] rounded-[16px] p-5 neo-shadow-md">
+        <div className="lg:col-span-5 space-y-2">
+          <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-bold text-[16px] text-[#111] flex items-center">
                 <Layers className="w-4 h-4 mr-2" strokeWidth={2.5} />
@@ -292,7 +275,7 @@ function ClaimDetailContent() {
           </div>
 
           {/* Description Box */}
-          <div className="bg-white border-2 border-[#111] rounded-[16px] p-5 neo-shadow-md">
+          <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
             <h3 className="font-bold text-[14px] text-[#111] mb-2">Customer Statement</h3>
             <p className="text-[13px] text-[#111]/80 leading-relaxed bg-[#fdf9f0] p-3 border-2 border-[#111] rounded-[10px]">
               &quot;{claim.description}&quot;
@@ -301,10 +284,10 @@ function ClaimDetailContent() {
         </div>
 
         {/* Right Column: Verification Engine & Risk Signals (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
+        <div className="lg:col-span-7 space-y-2">
           
           {/* Verification Pipeline Card */}
-          <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md">
+          <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="font-bold text-[18px] text-[#111]">Verification Pipeline</h2>
@@ -348,7 +331,7 @@ function ClaimDetailContent() {
           </div>
 
           {/* Risk Assessment & Signals Breakdown Card */}
-          <div className="bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md">
+          <div className="bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="font-bold text-[18px] text-[#111]">Verification Risk Breakdown</h2>
@@ -389,7 +372,7 @@ function ClaimDetailContent() {
             </div>
 
             {/* Bottom summary note */}
-            <div className="mt-5 p-3.5 bg-[#ffd23f]/30 border-2 border-[#111] rounded-[10px] text-[12px] font-medium text-[#111]">
+            <div className="mt-1 p-3.5 bg-[#ffd23f]/30 border-2 border-[#111] rounded-[10px] text-[12px] font-medium text-[#111]">
               <strong>AI Recommendation:</strong> Due to duplicate image detection (94%) and manipulation artifacts, request a live re-capture of the package with the delivery receipt or reject according to policy.
             </div>
           </div>
@@ -398,9 +381,9 @@ function ClaimDetailContent() {
 
       {/* Review Modal */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#111]/60 backdrop-blur-sm animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-2 bg-[#111]/60 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="w-full max-w-xl max-w-[calc(100vw-24px)] max-h-[90vh] bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
+            <div className="flex items-center justify-between p-2 sm:p-2 border-b-2 border-[#111] bg-[#fdf9f0]">
               <div>
                 <h3 className="font-display text-[17px] sm:text-[20px] uppercase text-[#111]">Claim Review: {claim.id}</h3>
                 <p className="text-[11px] sm:text-[12px] text-[#111]/70 font-medium">Record human reviewer determination and audit reason.</p>
@@ -413,7 +396,7 @@ function ClaimDetailContent() {
               </button>
             </div>
 
-            <form onSubmit={handleDecisionSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto">
+            <form onSubmit={handleDecisionSubmit} className="p-2 sm:p-2 space-y-1 sm:space-y-5 overflow-y-auto">
               {actionDoneMsg && (
                 <div className="p-3 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] flex items-center text-[13px] font-bold">
                   <CheckCircle2 className="w-5 h-5 mr-2" />
@@ -435,7 +418,7 @@ function ClaimDetailContent() {
                       type="button"
                       key={i}
                       onClick={() => setSelectedDecision(btn.value as any)}
-                      className={`p-3 min-h-[44px] border-2 border-[#111] rounded-[10px] font-bold text-[13px] text-left transition-all ${
+                      className={`p-3 min-h-[32px] border-2 border-[#111] rounded-[10px] font-bold text-[13px] text-left transition-all ${
                         selectedDecision === btn.value ? "bg-[#111] text-white neo-shadow-sm" : `bg-white text-[#111] ${btn.color}`
                       }`}
                     >
@@ -461,13 +444,13 @@ function ClaimDetailContent() {
                 <button
                   type="button"
                   onClick={() => setIsReviewModalOpen(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
+                  className="w-full sm:w-auto px-4 py-2.5 min-h-[32px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+                  className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
                 >
                   Confirm Decision
                 </button>

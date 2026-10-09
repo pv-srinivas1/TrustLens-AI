@@ -106,11 +106,11 @@ function EvidenceContent() {
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-2 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-2">
         <div>
-          <h1 className="font-display text-[24px] sm:text-[28px] text-[#111] uppercase tracking-tight flex items-center">
+          <h1 className="font-display text-[16px] sm:text-[28px] text-[#111] uppercase tracking-tight flex items-center">
             <Layers className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
             Evidence Explorer
           </h1>
@@ -124,7 +124,7 @@ function EvidenceContent() {
           />
           <button 
             onClick={() => setIsUploadModalOpen(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center px-4 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
+            className="flex-1 sm:flex-none flex items-center justify-center px-4 py-2.5 min-h-[32px] bg-[#3ddc97] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] hover-neo-sm transition-transform"
           >
             <Upload className="w-4 h-4 mr-1.5" strokeWidth={2.5} /> Upload Evidence
           </button>
@@ -132,7 +132,7 @@ function EvidenceContent() {
       </div>
 
       {/* Search & Filter Pills */}
-      <div className="bg-white border-2 border-[#111] rounded-[14px] p-3 sm:p-4 neo-shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="bg-white border-2 border-[#111] rounded-[14px] p-3 sm:p-2 neo-shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-3 w-4 h-4 text-[#111]" strokeWidth={2.5} />
           <input 
@@ -140,7 +140,7 @@ function EvidenceContent() {
             placeholder="Search evidence ID, Claim ID, filename..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] text-[#111] placeholder:text-[#111]/50 focus:outline-none focus:bg-white"
+            className="w-full pl-10 pr-4 py-2 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-medium text-[13px] text-[#111] placeholder:text-[#111]/50 focus:outline-none focus:bg-white"
           />
         </div>
 
@@ -184,7 +184,7 @@ function EvidenceContent() {
       {/* MOBILE EVIDENCE GALLERY: 1 column on small phones, 2 columns on larger phones */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-3.5">
         {filteredEvidence.length === 0 ? (
-          <div className="col-span-full py-12 text-center bg-white border-2 border-[#111] rounded-[14px] p-6">
+          <div className="col-span-full py-12 text-center bg-white border-2 border-[#111] rounded-[14px] p-2">
             <p className="font-bold text-[15px] text-[#111]">No evidence found</p>
             <p className="text-[12px] text-[#111]/60 mt-1">Try resetting search or filter criteria.</p>
           </div>
@@ -253,7 +253,7 @@ function EvidenceContent() {
                 {/* Inspect Action */}
                 <button
                   onClick={() => setInspectedItem(ev)}
-                  className="w-full py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] uppercase tracking-wider flex items-center justify-center hover-neo-sm transition-transform"
+                  className="w-full py-2.5 min-h-[32px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] uppercase tracking-wider flex items-center justify-center hover-neo-sm transition-transform"
                 >
                   <Eye className="w-4 h-4 mr-1.5" /> Inspect Analysis
                 </button>
@@ -264,7 +264,7 @@ function EvidenceContent() {
       </div>
 
       {/* DESKTOP TABLE: Visible on md: and above */}
-      <div className="hidden md:block bg-white border-2 border-[#111] rounded-[16px] p-6 neo-shadow-md overflow-x-auto">
+      <div className="hidden md:block bg-white border-2 border-[#111] rounded-[16px] p-2 neo-shadow-md overflow-x-auto">
         <table className="w-full min-w-[950px] text-left">
           <thead>
             <tr className="border-b-2 border-[#111]">
@@ -358,11 +358,11 @@ function EvidenceContent() {
 
       {/* Evidence Detail Inspector Modal */}
       {inspectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-2 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-4xl bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col max-h-[90vh] overflow-hidden">
             
             {/* Modal Top */}
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
+            <div className="flex items-center justify-between p-2 sm:p-2 border-b-2 border-[#111] bg-[#fdf9f0]">
               <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap pr-2">
                 <span className="font-display text-[17px] sm:text-[22px] text-[#111] uppercase">
                   Evidence {inspectedItem.id}
@@ -380,10 +380,10 @@ function EvidenceContent() {
               </button>
             </div>
 
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-5 sm:space-y-6">
+            <div className="p-2 sm:p-2 overflow-y-auto space-y-5 sm:space-y-2">
               
               {/* Image & Primary Metadata (Stacked on mobile, side-by-side on desktop) */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-2">
                 
                 {/* 1. Evidence Viewer (Appears FIRST) */}
                 <div className="md:col-span-7">
@@ -407,7 +407,7 @@ function EvidenceContent() {
 
                 {/* 2. Evidence Information Specs */}
                 <div className="md:col-span-5 space-y-3">
-                  <div className="bg-[#fdf9f0] border-2 border-[#111] rounded-[12px] sm:rounded-[14px] p-4 space-y-2 text-[12px]">
+                  <div className="bg-[#fdf9f0] border-2 border-[#111] rounded-[12px] sm:rounded-[14px] p-2 space-y-2 text-[12px]">
                     <div className="flex justify-between items-center">
                       <span className="text-[#111]/70 font-medium">Source:</span>
                       <span className={`font-bold text-[11px] px-2 py-0.5 rounded border border-[#111] ${
@@ -450,7 +450,7 @@ function EvidenceContent() {
 
                   <Link
                     href={`/dashboard/claims/${inspectedItem.claimId}`}
-                    className="w-full py-2.5 min-h-[44px] text-center bg-[#ff3d81] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] flex items-center justify-center hover-neo-sm transition-transform"
+                    className="w-full py-2.5 min-h-[32px] text-center bg-[#ff3d81] border-2 border-[#111] rounded-[10px] neo-shadow-sm font-bold text-[13px] text-[#111] flex items-center justify-center hover-neo-sm transition-transform"
                   >
                     Open Associated Claim ({inspectedItem.claimId})
                   </Link>
@@ -458,10 +458,10 @@ function EvidenceContent() {
               </div>
 
               {/* 3. Analysis Modules: Provenance, Forensics, OCR */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-2">
                 
                 {/* Provenance */}
-                <div className="bg-white border-2 border-[#111] rounded-[14px] p-4 neo-shadow-sm space-y-2">
+                <div className="bg-white border-2 border-[#111] rounded-[14px] p-2 neo-shadow-sm space-y-2">
                   <h4 className="font-display text-[13px] uppercase text-[#111] border-b-2 border-[#111] pb-1">
                     Provenance
                   </h4>
@@ -478,7 +478,7 @@ function EvidenceContent() {
                 </div>
 
                 {/* Forensics */}
-                <div className="bg-white border-2 border-[#111] rounded-[14px] p-4 neo-shadow-sm space-y-2">
+                <div className="bg-white border-2 border-[#111] rounded-[14px] p-2 neo-shadow-sm space-y-2">
                   <h4 className="font-display text-[13px] uppercase text-[#111] border-b-2 border-[#111] pb-1">
                     Forensics
                   </h4>
@@ -503,7 +503,7 @@ function EvidenceContent() {
                 </div>
 
                 {/* OCR */}
-                <div className="bg-white border-2 border-[#111] rounded-[14px] p-4 neo-shadow-sm space-y-2">
+                <div className="bg-white border-2 border-[#111] rounded-[14px] p-2 neo-shadow-sm space-y-2">
                   <h4 className="font-display text-[13px] uppercase text-[#111] border-b-2 border-[#111] pb-1">
                     OCR Extraction
                   </h4>
@@ -522,7 +522,7 @@ function EvidenceContent() {
 
               {/* 4. Duplicate Detection */}
               {inspectedItem.duplicateMatch && (
-                <div className="bg-[#ffd23f]/30 border-2 border-[#111] rounded-[14px] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="bg-[#ffd23f]/30 border-2 border-[#111] rounded-[14px] p-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <h4 className="font-bold text-[14px] text-[#111] flex items-center">
                       <AlertTriangle className="w-4 h-4 mr-1.5 shrink-0" />
@@ -535,7 +535,7 @@ function EvidenceContent() {
                   <div className="flex items-center space-x-2 w-full sm:w-auto">
                     <Link
                       href={`/dashboard/claims/${inspectedItem.duplicateMatch.matchedClaimId}`}
-                      className="w-full sm:w-auto px-4 py-2 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] flex items-center justify-center hover-neo-sm transition-transform"
+                      className="w-full sm:w-auto px-4 py-2 min-h-[32px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] flex items-center justify-center hover-neo-sm transition-transform"
                     >
                       Open Claim
                     </Link>
@@ -549,9 +549,9 @@ function EvidenceContent() {
 
       {/* Upload Evidence Modal */}
       {isUploadModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-2 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-lg bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
+            <div className="flex items-center justify-between p-2 sm:p-2 border-b-2 border-[#111] bg-[#fdf9f0]">
               <h3 className="font-display text-[18px] sm:text-[20px] uppercase text-[#111]">Upload Evidence</h3>
               <button 
                 onClick={() => setIsUploadModalOpen(false)}
@@ -562,7 +562,7 @@ function EvidenceContent() {
               </button>
             </div>
 
-            <form onSubmit={handleUploadSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto">
+            <form onSubmit={handleUploadSubmit} className="p-2 sm:p-2 space-y-1 overflow-y-auto">
               <div className="space-y-1.5">
                 <label className="font-bold text-[12px] uppercase tracking-wide">Attach to Claim</label>
                 <input 
@@ -571,7 +571,7 @@ function EvidenceContent() {
                   onChange={(e) => setUploadClaimId(e.target.value)}
                   placeholder="CLM-1001"
                   required
-                  className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono text-[13px] font-bold"
+                  className="w-full p-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono text-[13px] font-bold"
                 />
               </div>
 
@@ -583,11 +583,11 @@ function EvidenceContent() {
                   onChange={(e) => setUploadFilename(e.target.value)}
                   placeholder="damage.jpg"
                   required
-                  className="w-full p-2.5 min-h-[44px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono text-[13px]"
+                  className="w-full p-2.5 min-h-[32px] bg-[#fdf9f0] border-2 border-[#111] rounded-[10px] font-mono text-[13px]"
                 />
               </div>
 
-              <div className="border-2 border-dashed border-[#111] rounded-[12px] p-5 sm:p-6 text-center bg-[#fdf9f0]">
+              <div className="border-2 border-dashed border-[#111] rounded-[12px] p-2 sm:p-2 text-center bg-[#fdf9f0]">
                 <Camera className="w-8 h-8 text-[#111] mx-auto mb-2" strokeWidth={2.5} />
                 <p className="text-[13px] font-bold">Select image from device</p>
                 <p className="text-[11px] text-[#111]/60 mt-1">Simulated evidence ingest with C2PA analysis</p>
@@ -597,13 +597,13 @@ function EvidenceContent() {
                 <button
                   type="button"
                   onClick={() => setIsUploadModalOpen(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
+                  className="w-full sm:w-auto px-4 py-2.5 min-h-[32px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+                  className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-[#3ddc97] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
                 >
                   Start Analysis
                 </button>

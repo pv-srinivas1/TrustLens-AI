@@ -51,9 +51,9 @@ export default function ReviewQueuePage() {
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-2 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-2">
         <div>
           <h1 className="font-display text-[28px] text-[#111] uppercase tracking-tight flex items-center">
             <CheckSquare className="w-7 h-7 mr-2.5 text-[#ff3d81]" strokeWidth={2.5} />
@@ -76,7 +76,7 @@ export default function ReviewQueuePage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 min-h-[44px] border-2 border-[#111] rounded-[10px] font-bold text-[13px] whitespace-nowrap transition-transform ${
+            className={`px-4 py-2 min-h-[32px] border-2 border-[#111] rounded-[10px] font-bold text-[13px] whitespace-nowrap transition-transform ${
               activeTab === tab
                 ? "bg-[#ff3d81] text-[#111] neo-shadow-sm hover-neo-sm"
                 : "bg-white text-[#111] hover:bg-[#fdf9f0]"
@@ -88,10 +88,10 @@ export default function ReviewQueuePage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-3 sm:p-6 neo-shadow-md w-full overflow-x-auto">
+      <div className="bg-white border-2 border-[#111] rounded-[14px] sm:rounded-[16px] p-3 sm:p-2 neo-shadow-md w-full overflow-x-auto">
         {reviewClaims.length === 0 ? (
           <div className="py-16 text-center">
-            <div className="w-12 h-12 rounded-full bg-[#3ddc97] border-2 border-[#111] flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-8 rounded-full bg-[#3ddc97] border-2 border-[#111] flex items-center justify-center mx-auto mb-3">
               <CheckCircle2 className="w-6 h-6 text-[#111]" strokeWidth={2.5} />
             </div>
             <h3 className="font-bold text-[16px] text-[#111]">Queue Cleared!</h3>
@@ -163,11 +163,11 @@ export default function ReviewQueuePage() {
 
       {/* Review Screen Modal */}
       {selectedClaim && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-2 bg-[#111]/50 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="w-full max-w-[calc(100vw-20px)] sm:max-w-3xl bg-white border-2 border-[#111] rounded-[16px] sm:rounded-[20px] neo-shadow-lg flex flex-col max-h-[90vh] overflow-hidden">
             
             {/* Modal Top */}
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b-2 border-[#111] bg-[#fdf9f0]">
+            <div className="flex items-center justify-between p-2 sm:p-2 border-b-2 border-[#111] bg-[#fdf9f0]">
               <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap pr-2">
                 <span className="font-display text-[16px] sm:text-[20px] text-[#111] uppercase">
                   Claim Review • {selectedClaim.id}
@@ -187,7 +187,7 @@ export default function ReviewQueuePage() {
               </button>
             </div>
 
-            <form onSubmit={handleConfirmDecision} className="p-6 overflow-y-auto space-y-6">
+            <form onSubmit={handleConfirmDecision} className="p-2 overflow-y-auto space-y-2">
               {toastMessage && (
                 <div className="p-3 bg-[#3ddc97] border-2 border-[#111] rounded-[10px] flex items-center text-[13px] font-bold">
                   <CheckCircle2 className="w-5 h-5 mr-2" />
@@ -196,7 +196,7 @@ export default function ReviewQueuePage() {
               )}
 
               {/* Top Details & Evidence Preview */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {/* Evidence Image */}
                 <div className="space-y-1.5">
                   <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#111]/70">Evidence Preview</label>
@@ -269,7 +269,7 @@ export default function ReviewQueuePage() {
                       key={i}
                       type="button"
                       onClick={() => setDecision(btn.value as any)}
-                      className={`p-3 min-h-[44px] border-2 border-[#111] rounded-[10px] font-bold text-[12px] text-center transition-all ${
+                      className={`p-3 min-h-[32px] border-2 border-[#111] rounded-[10px] font-bold text-[12px] text-center transition-all ${
                         decision === btn.value ? `${btn.bg} neo-shadow-sm` : "bg-white hover:bg-[#fdf9f0]"
                       }`}
                     >
@@ -299,13 +299,13 @@ export default function ReviewQueuePage() {
                 <button
                   type="button"
                   onClick={() => setSelectedClaim(null)}
-                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
+                  className="w-full sm:w-auto px-4 py-2.5 min-h-[32px] bg-white border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
+                  className="w-full sm:w-auto px-5 py-2.5 min-h-[32px] bg-[#ff3d81] border-2 border-[#111] rounded-[8px] neo-shadow-sm font-bold text-[12px] text-[#111] hover-neo-sm transition-transform"
                 >
                   Confirm Decision
                 </button>
