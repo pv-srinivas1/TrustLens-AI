@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { 
   ArrowRight, 
   ShieldCheck, 
@@ -13,6 +14,11 @@ import {
 } from "lucide-react";
 
 export default function TrustLensLandingPage() {
+  const [currentYear, setCurrentYear] = useState(2026);
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
+
   return (
     <div className="min-h-screen bg-white text-[#111827] font-sans selection:bg-[#2563EB] selection:text-white flex flex-col justify-between">
       {/* GLOBAL TYPOGRAPHY: Inter */}
@@ -199,7 +205,7 @@ export default function TrustLensLandingPage() {
           </div>
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 text-[13px] text-[#6B7280]">
             <span>See the Evidence. Verify the Claim.</span>
-            <span suppressHydrationWarning>© {new Date().getFullYear()}</span>
+            <span>© {currentYear}</span>
           </div>
         </div>
       </footer>
