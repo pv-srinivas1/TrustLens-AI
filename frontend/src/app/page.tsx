@@ -54,39 +54,39 @@ export default function TrustLensLandingPage() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 space-y-24">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-4 space-y-6">
         
         {/* 3. HERO SECTION */}
-        <section className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto">
+        <section className="flex flex-col items-center text-center space-y-4 max-w-4xl mx-auto">
           <div className="inline-flex items-center px-3 py-1 bg-[#EFF6FF] text-[#2563EB] text-[12px] font-semibold rounded-full border border-[#BFDBFE] uppercase tracking-wide">
             <ShieldCheck className="w-3.5 h-3.5 mr-1.5" />
             AI-POWERED EVIDENCE VERIFICATION
           </div>
           
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#111827] leading-[1.1]">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#111827] leading-[1.1]">
             Verify <span className="text-[#2563EB]">Digital Evidence</span>. <br className="hidden md:block"/>Make Better Decisions.
           </h1>
           
-          <p className="text-[16px] md:text-[18px] text-[#6B7280] max-w-3xl leading-relaxed">
+          <p className="text-[15px] md:text-[16px] text-[#6B7280] max-w-3xl leading-relaxed">
             Analyze uploaded evidence using provenance checks, image forensics, duplicate detection, OCR, and explainable risk signals — all in one verification workflow.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full sm:w-auto">
             <Link 
               href="/dashboard"
-              className="w-full sm:w-auto flex items-center justify-center px-6 py-3 min-h-[48px] bg-[#2563EB] text-white text-[15px] font-medium rounded-md hover:bg-[#1D4ED8] shadow-sm transition-all focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
+              className="w-full sm:w-auto flex items-center justify-center px-4 py-2 min-h-[40px] bg-[#2563EB] text-white text-[14px] font-medium rounded-md hover:bg-[#1D4ED8] shadow-sm transition-all focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
             >
               Open Dashboard <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
             <Link 
               href="#how-it-works"
-              className="w-full sm:w-auto flex items-center justify-center px-6 py-3 min-h-[48px] bg-white text-[#374151] border border-[#D1D5DB] text-[15px] font-medium rounded-md hover:bg-[#F9FAFB] transition-all focus:ring-2 focus:ring-[#E5E7EB] focus:ring-offset-2"
+              className="w-full sm:w-auto flex items-center justify-center px-4 py-2 min-h-[40px] bg-white text-[#374151] border border-[#D1D5DB] text-[14px] font-medium rounded-md hover:bg-[#F9FAFB] transition-all focus:ring-2 focus:ring-[#E5E7EB] focus:ring-offset-2"
             >
               Explore Verification
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 pt-8 text-[#6B7280] text-[13px] font-medium">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-2 text-[#6B7280] text-[12px] font-medium">
             <div className="flex items-center"><Search className="w-4 h-4 mr-2" /> Evidence Provenance</div>
             <div className="flex items-center"><Camera className="w-4 h-4 mr-2" /> Image Forensics</div>
             <div className="flex items-center"><Activity className="w-4 h-4 mr-2" /> Explainable Risk Analysis</div>
@@ -105,9 +105,9 @@ export default function TrustLensLandingPage() {
                 High Risk
               </span>
             </div>
-            <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-1 space-y-6">
-                <div className="p-4 border border-[#E5E7EB] rounded-lg bg-[#F9FAFB]">
+            <div className="p-4 md:p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-1 space-y-4">
+                <div className="p-3 border border-[#E5E7EB] rounded-lg bg-[#F9FAFB]">
                   <div className="text-[12px] font-semibold text-[#6B7280] uppercase mb-1">Risk Assessment</div>
                   <div className="text-3xl font-bold text-[#111827]">72<span className="text-lg text-[#9CA3AF]">/100</span></div>
                   <div className="mt-2 text-[13px] text-[#6B7280]">Confidence: Medium</div>
@@ -162,31 +162,31 @@ export default function TrustLensLandingPage() {
         </section>
 
         {/* 5. HOW IT WORKS */}
-        <section id="how-it-works" className="max-w-4xl mx-auto pt-10">
-          <h2 className="text-2xl font-bold text-[#111827] text-center mb-12">How it works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            <div className="hidden md:block absolute top-6 left-[16%] right-[16%] h-[1px] bg-[#E5E7EB] -z-10"></div>
+        <section id="how-it-works" className="max-w-4xl mx-auto pt-2">
+          <h2 className="text-xl font-bold text-[#111827] text-center mb-6">How it works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative">
+            <div className="hidden md:block absolute top-5 left-[16%] right-[16%] h-[1px] bg-[#E5E7EB] -z-10"></div>
             
-            <div className="flex flex-col items-center text-center space-y-4 bg-white">
-              <div className="w-12 h-12 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center font-bold text-lg border border-[#BFDBFE]">1</div>
-              <h3 className="font-semibold text-[#111827] text-[16px]">Submit Evidence</h3>
-              <p className="text-[14px] text-[#6B7280] leading-relaxed">
+            <div className="flex flex-col items-center text-center space-y-2 bg-white">
+              <div className="w-10 h-10 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center font-bold text-sm border border-[#BFDBFE]">1</div>
+              <h3 className="font-semibold text-[#111827] text-[14px]">Submit Evidence</h3>
+              <p className="text-[13px] text-[#6B7280] leading-snug">
                 Upload a picture or capture it using the camera securely.
               </p>
             </div>
             
-            <div className="flex flex-col items-center text-center space-y-4 bg-white">
-              <div className="w-12 h-12 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center font-bold text-lg border border-[#BFDBFE]">2</div>
-              <h3 className="font-semibold text-[#111827] text-[16px]">Analyze Signals</h3>
-              <p className="text-[14px] text-[#6B7280] leading-relaxed">
+            <div className="flex flex-col items-center text-center space-y-2 bg-white">
+              <div className="w-10 h-10 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center font-bold text-sm border border-[#BFDBFE]">2</div>
+              <h3 className="font-semibold text-[#111827] text-[14px]">Analyze Signals</h3>
+              <p className="text-[13px] text-[#6B7280] leading-snug">
                 Examine provenance, file metadata, image patterns, OCR, and similarities.
               </p>
             </div>
             
-            <div className="flex flex-col items-center text-center space-y-4 bg-white">
-              <div className="w-12 h-12 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center font-bold text-lg border border-[#BFDBFE]">3</div>
-              <h3 className="font-semibold text-[#111827] text-[16px]">Review Results</h3>
-              <p className="text-[14px] text-[#6B7280] leading-relaxed">
+            <div className="flex flex-col items-center text-center space-y-2 bg-white">
+              <div className="w-10 h-10 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center font-bold text-sm border border-[#BFDBFE]">3</div>
+              <h3 className="font-semibold text-[#111827] text-[14px]">Review Results</h3>
+              <p className="text-[13px] text-[#6B7280] leading-snug">
                 View an explainable risk assessment and route uncertain claims for human review.
               </p>
             </div>
@@ -196,7 +196,7 @@ export default function TrustLensLandingPage() {
       </main>
 
       {/* 7. FOOTER */}
-      <footer className="w-full border-t border-[#E5E7EB] bg-[#F9FAFB] py-8">
+      <footer className="w-full border-t border-[#E5E7EB] bg-[#F9FAFB] py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-[14px] text-[#111827]">TrustLens Technologies</span>
