@@ -8,12 +8,8 @@
  */
 
 export function getApiBaseUrl(): string {
-  if (typeof window !== "undefined") {
-    // Client-side: use relative path by default to leverage Vercel / Next.js rewrites
-    return process.env.NEXT_PUBLIC_API_URL || "";
-  }
-  // Server-side: use bound service URL or fallback
-  return process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  // Always return the Render backend URL directly to avoid Vercel rewrite issues
+  return "https://trustlens-api-ds3s.onrender.com";
 }
 
 export function apiUrl(endpoint: string): string {
