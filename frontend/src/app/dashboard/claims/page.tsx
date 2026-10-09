@@ -122,7 +122,7 @@ export default function ClaimsPage() {
         currency,
         description,
         evidenceCount: 1,
-        evidenceFile: filename,
+        evidenceFile: selectedEvidence?.previewUrl || filename,
         evidenceSize: selectedEvidence?.fileSize || "2.4 MB",
         evidenceHash: backendData?.evidence_id ? `sha256-${backendData.evidence_id}` : "a9f43b77e81029da483cf29188e0182c402198be9031",
         evidenceDimensions: "1280 × 960",

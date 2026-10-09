@@ -37,7 +37,7 @@ function ClaimDetailContent() {
   const isDemo = sourceType === "demo";
   const isCamera = sourceType === "camera_capture";
 
-  const imageSrc = claim.evidenceFile?.startsWith("http")
+  const imageSrc = claim.evidenceFile?.startsWith("http") || claim.evidenceFile?.startsWith("blob")
     ? claim.evidenceFile
     : claim.evidenceFile?.startsWith("/")
       ? claim.evidenceFile
