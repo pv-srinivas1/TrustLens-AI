@@ -180,7 +180,7 @@ def create_header(title: str, subtitle: str, org_name: str = "TrustLens Technolo
             left_cell,
             [
                 Paragraph(f"<b>{org_name}</b><br/>Exported: {now_str}", styles['MetaText']),
-                Spacer(1, 10),
+                Spacer(1, 5),
                 Paragraph(f"Report Type: <b>{title}</b>", styles['MetaText'])
             ]
         ]
@@ -197,9 +197,9 @@ def create_header(title: str, subtitle: str, org_name: str = "TrustLens Technolo
     elements = [
         header_table,
         Spacer(1, 4),
-        HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#0f172a"), spaceBefore=4, spaceAfter=8),
+        HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#1e3a8a"), spaceBefore=4, spaceAfter=8),
         Paragraph(subtitle, styles['DocSubTitle']),
-        Spacer(1, 10),
+        Spacer(1, 5),
     ]
     return elements
 
@@ -276,7 +276,7 @@ def generate_overview_pdf(stats: dict, claims: list, date_range: str = "Last 7 d
     ]
     risk_table = Table(risk_summary, colWidths=[120, 120, 120, 127], repeatRows=1)
     risk_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -314,7 +314,7 @@ def generate_overview_pdf(stats: dict, claims: list, date_range: str = "Last 7 d
             ])
         p_table = Table(table_rows, colWidths=[85, 105, 75, 80, 80, 62], repeatRows=1)
         p_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
             ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
             ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
             ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -393,7 +393,7 @@ def generate_claims_pdf(claims: list, filters_applied: dict = None) -> bytes:
 
     table = Table(table_data, colWidths=[72, 65, 85, 55, 65, 55, 50, 40], repeatRows=1)
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -414,10 +414,10 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     doc = SimpleDocTemplate(
         buffer,
         pagesize=A4,
-        leftMargin=54,
-        rightMargin=54,
-        topMargin=54,
-        bottomMargin=54
+        leftMargin=30,
+        rightMargin=30,
+        topMargin=30,
+        bottomMargin=30
     )
     styles = get_styles()
     story = []
@@ -428,14 +428,23 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     # Claim Primary Meta Card
     created_str = claim.created_at.strftime("%d %b %Y, %H:%M UTC") if getattr(claim, "created_at", None) else "—"
     source_label = (getattr(claim, "source_type", "real_upload") or "real_upload").replace("_", " ").title()
+    
+    # Mask sensitive details
+    cust_id_masked = getattr(claim, "customer_id", "—")
+    if cust_id_masked and cust_id_masked != "—":
+        cust_id_masked = cust_id_masked[:2] + "********" + cust_id_masked[-2:] if len(cust_id_masked) > 4 else "********"
+        
+    order_id_masked = getattr(claim, "order_id", "—")
+    if order_id_masked and order_id_masked != "—":
+        order_id_masked = order_id_masked[:2] + "********" + order_id_masked[-2:] if len(order_id_masked) > 4 else "********"
 
     meta_rows = [
         [
             Paragraph("Claim ID", styles['CellTextBold']), Paragraph(claim_num, styles['CellText']),
-            Paragraph("Customer ID", styles['CellTextBold']), Paragraph(getattr(claim, "customer_id", "—"), styles['CellText']),
+            Paragraph("Customer ID", styles['CellTextBold']), Paragraph(cust_id_masked, styles['CellText']),
         ],
         [
-            Paragraph("Order ID", styles['CellTextBold']), Paragraph(getattr(claim, "order_id", "—"), styles['CellText']),
+            Paragraph("Order ID", styles['CellTextBold']), Paragraph(order_id_masked, styles['CellText']),
             Paragraph("Claim Type", styles['CellTextBold']), Paragraph(claim.claim_type or "—", styles['CellText']),
         ],
         [
@@ -456,13 +465,13 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
     ]))
     story.append(meta_table)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 5))
 
     # Description
     story.append(Paragraph("Customer Claim Statement", styles['SectionTitle']))
     desc_text = claim.description or "No customer description provided."
     story.append(Paragraph(f"<i>\"{desc_text}\"</i>", styles['CellText']))
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 5))
 
     # Verification Risk Section
     story.append(Paragraph("Verification Risk Assessment", styles['SectionTitle']))
@@ -484,7 +493,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     ]
     risk_meta_table = Table(risk_meta, colWidths=[160, 160, 167])
     risk_meta_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -493,7 +502,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
     ]))
     story.append(risk_meta_table)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 5))
 
     # Verification Pipeline Table (9 signals from specification)
     story.append(Paragraph("Multi-Engine Forensic Signal Breakdown", styles['SectionTitle']))
@@ -511,7 +520,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     ]
     sig_table = Table(signal_rows, colWidths=[140, 105, 242], repeatRows=1)
     sig_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -519,7 +528,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
     ]))
     story.append(sig_table)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 5))
 
     # Flowchart Visualizer
     story.append(Paragraph("AI Verification Pipeline Path", styles['SectionTitle']))
@@ -539,7 +548,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     ]
     flow_table = Table(flowchart_data, colWidths=[120, 120, 120, 120])
     flow_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e293b")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#eab308")),
         ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor("#f8fafc")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -549,7 +558,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
     ]))
     story.append(flow_table)
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 6))
 
     # Evidence & Image Section
     story.append(Paragraph("Uploaded Evidence Artifact", styles['SectionTitle']))
@@ -569,7 +578,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
         ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
     ]))
     story.append(ev_table)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 4))
 
     # Try to securely embed the real image if it exists on disk or via URL
     embedded_img = False
@@ -593,12 +602,12 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
                 req = urllib.request.Request(path, headers={'User-Agent': 'Mozilla/5.0'})
                 with urllib.request.urlopen(req, timeout=5) as response:
                     img_data = response.read()
-                rl_img = RLImage(BytesIO(img_data), width=4.5 * inch, height=3.0 * inch)
+                rl_img = RLImage(BytesIO(img_data), width=3.0 * inch, height=2.0 * inch)
             except Exception as e:
                 print("Failed to download image URL for PDF:", e)
         elif isinstance(path, str) and os.path.exists(path) and os.path.isfile(path):
             try:
-                rl_img = RLImage(path, width=4.5 * inch, height=3.0 * inch)
+                rl_img = RLImage(path, width=3.0 * inch, height=2.0 * inch)
             except Exception:
                 pass
 
@@ -614,7 +623,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     if not embedded_img:
         story.append(Paragraph("<i>[Evidence file stored securely in Supabase Storage - Thumbnail not available]</i>", styles['MetaText']))
 
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 6))
 
     # Audit Trail Table
     story.append(Paragraph("Compliance Audit Timeline", styles['SectionTitle']))
@@ -626,7 +635,7 @@ def generate_claim_details_pdf(claim, evidence_list: list = None, signals: list 
     ]
     audit_table = Table(audit_rows, colWidths=[110, 110, 197, 70], repeatRows=1)
     audit_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -696,7 +705,7 @@ def generate_review_queue_pdf(claims: list) -> bytes:
 
     table = Table(table_data, colWidths=[80, 75, 60, 72, 110, 50, 40], repeatRows=1)
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -764,7 +773,7 @@ def generate_evidence_pdf(evidence_items: list) -> bytes:
 
     table = Table(table_data, colWidths=[80, 75, 95, 65, 82, 50, 40], repeatRows=1)
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -838,7 +847,7 @@ def generate_risk_analytics_pdf(analytics_data: dict, date_range: str = "Last 30
     ]
     sig_table = Table(sig_rows, colWidths=[130, 65, 85, 207], repeatRows=1)
     sig_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -860,7 +869,7 @@ def generate_risk_analytics_pdf(analytics_data: dict, date_range: str = "Last 30
     ]
     cat_table = Table(cat_rows, colWidths=[140, 80, 95, 172], repeatRows=1)
     cat_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
@@ -923,7 +932,7 @@ def generate_audit_logs_pdf(logs: list) -> bytes:
 
     table = Table(table_data, colWidths=[110, 80, 110, 127, 60], repeatRows=1)
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
