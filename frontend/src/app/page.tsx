@@ -55,7 +55,7 @@ export default function TrustLensLandingPage() {
 
       {/* FOOTER */}
       <footer className="w-full max-w-4xl py-6 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">
-        <span>© {new Date().getFullYear()} TrustLens Technologies.</span>
+        <span>© 2026 TrustLens Technologies.</span>
         <span>Secure Verification System</span>
       </footer>
     </div>
