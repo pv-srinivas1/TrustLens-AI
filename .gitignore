@@ -19,19 +19,32 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Environment
+# Environment & Secrets
 .env
 .env.*
 !.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+*.local
 .env.local
 .env.*.local
+*.pem
+*.key
+
+# Database & Cache Dumps
+dump.rdb
+*.rdb
+backend/dump.rdb
 
 # Temporary / Scratch scripts
 test_*.py
 organize_demo.py
 .skills.json
 backend/uploads/
-
 
 # Redis Binaries
 backend/Redis/

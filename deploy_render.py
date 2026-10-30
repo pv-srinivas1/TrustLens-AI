@@ -1,6 +1,7 @@
+import os
 import requests
 
-RENDER_API_KEY = "your-render-api-key"
+RENDER_API_KEY = os.getenv("RENDER_API_KEY", "your-render-api-key")
 headers = {
     "Authorization": f"Bearer {RENDER_API_KEY}",
     "Accept": "application/json",
