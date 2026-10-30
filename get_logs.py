@@ -1,3 +1,4 @@
+"""TrustLens Technologies - Fetch Render Deployment Logs."""
 import os
 import requests
 

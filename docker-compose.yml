@@ -1,5 +1,8 @@
 version: '3.8'
 
+# TrustLens Technologies - Docker Compose Configuration
+# Copy backend/.env.example to backend/.env before running: docker-compose up
+
 services:
   api:
     build:
@@ -11,7 +14,6 @@ services:
       - ./backend/.env
     environment:
       - REDIS_URL=redis://redis:6379/0
-      # Overrides from .env will be applied automatically via env_file
     depends_on:
       - redis
       - postgres

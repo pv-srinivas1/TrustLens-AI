@@ -10,6 +10,47 @@ The system combines digital content provenance, image forensics, duplicate-evide
 
 TrustLens is designed for food delivery, quick commerce, e-commerce, travel and marketplace platforms.
 
+## Getting Started
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/pv-srinivas1/TrustLens-AI.git
+cd TrustLens-AI
+```
+
+### 2. Configure Environment Variables
+Copy the templates to create local configuration files:
+```bash
+# Backend
+cp backend/.env.example backend/.env
+
+# Frontend
+cp frontend/.env.example frontend/.env.local
+```
+
+### 3. Run Locally
+
+#### Using Docker Compose:
+```bash
+docker-compose up -d
+```
+
+#### Running Manually:
+- **Backend**:
+  ```bash
+  cd backend
+  python -m venv venv
+  .\venv\Scripts\activate   # Windows (or source venv/bin/activate on Linux/Mac)
+  pip install -r requirements.txt
+  uvicorn app.main:app --reload --port 8000
+  ```
+- **Frontend**:
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
+
 ## Problem Statement
 Modern digital platforms process a large number of refund and complaint requests every day.
 Common claims include:
@@ -58,7 +99,7 @@ The risk engine produces a score between 0 and 100.
 - **81–100 (Critical risk)**: TRUST & SAFETY ESCALATION
 
 ## Explainability
-Every high-risk result should provide understandable reasons.
+Every high-risk result provides understandable reasons.
 Example:
 ```
 Risk Score: 87
@@ -72,10 +113,13 @@ Signals:
 ```
 
 ## Technology Stack
-- **Frontend**: Next.js, TypeScript, Tailwind CSS, shadcn/ui, Recharts
-- **Backend**: Python, FastAPI
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, shadcn/ui, Recharts
+- **Backend**: Python 3.11+, FastAPI, SQLAlchemy, Alembic
 - **Database/Storage**: PostgreSQL, Supabase, Cloudflare R2 / S3
 - **Processing**: Redis, Celery
 - **Computer Vision**: OpenCV, Pillow, ImageHash, Image embeddings
-- **AI/Provenance**: Multimodal vision models, C2PA, OpenAI Provenance API
-- **DevOps**: Docker, GitHub Actions, Vercel/Render
+- **AI/Provenance**: Multimodal vision models, C2PA
+- **Deployment**: Docker, Vercel, Render
+
+## License
+MIT License. Open-source and free to contribute.

@@ -1,3 +1,4 @@
+# TrustLens Technologies - Local Startup Script
 Write-Host "Starting TrustLens AI Platform Locally..."
 
 cd backend

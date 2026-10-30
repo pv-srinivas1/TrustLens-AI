@@ -1,3 +1,4 @@
+"""TrustLens Technologies - Update Render Service Configuration."""
 import os
 import requests
 

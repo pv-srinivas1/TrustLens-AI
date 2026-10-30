@@ -1,3 +1,4 @@
+"""TrustLens Technologies - Render Deployment Trigger Script."""
 import os
 import requests
 
